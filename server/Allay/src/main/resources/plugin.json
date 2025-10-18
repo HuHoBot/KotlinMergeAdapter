@@ -1,0 +1,7 @@
+{
+  "entrance": "cn.huohuas001.huhobot.allay.HuHoBotAllay",
+  "name": "HuHoBot",
+  "authors": ["HuoHuas001"],
+  "version": "0.1.1",
+  "api_version": ">=0.14.0"
+}

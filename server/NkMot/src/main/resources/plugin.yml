@@ -1,0 +1,24 @@
+#name, main, version and api are required
+name: HuHoBot
+main: cn.huohuas001.huhobot.nkmot.HuHoBotNkMot
+#remember version and api is string, don't write it like this: 1.0.0, or there will be an exception
+version: "1.0.7"
+api: ["1.0.5"]
+load: POSTWORLD
+author: "HuoHuas001"
+description: Example plugin showing the API
+website: https://huhobot.txssb.cn
+prefix: "HuHoBot"
+
+commands:
+  example:
+    description: HuHoBot's control command
+    usage: "/huhobot"
+    aliases: []
+    permission: huhobot.command.permission
+    permission-message: "You do not have the required permission to run /huhobot"
+permissions:
+  huhobot.command.permission:
+    description: "Allows the user to run the huhobot command"
+    default: false
+

@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" factoryName="Application" name="Minecraft Client (:server-Architectury:fabric)" type="Application">
+    <option name="MAIN_CLASS_NAME" value="dev.architectury.transformer.TransformerRuntime"/>
+    <module name="HuHoBot.server-Architectury.fabric.main"/>
+    <option name="PROGRAM_PARAMETERS" value=""/>
+    <option name="VM_PARAMETERS" value="-Dfabric.dli.config=E:\Project\JavaProject\HuHoBot\HuHoBotKotlin\server\Architectury\fabric\.gradle\loom-cache\launch.cfg -Dfabric.dli.env=client -Dfabric.dli.main=net.fabricmc.loader.impl.launch.knot.KnotClient -Darchitectury.main.class=E:\Project\JavaProject\HuHoBot\HuHoBotKotlin\server\Architectury\fabric\.gradle\architectury\.main_class -Darchitectury.runtime.transformer=E:\Project\JavaProject\HuHoBot\HuHoBotKotlin\server\Architectury\fabric\.gradle\architectury\.transforms -Darchitectury.properties=E:\Project\JavaProject\HuHoBot\HuHoBotKotlin\server\Architectury\fabric\.gradle\architectury\.properties -Djdk.attach.allowAttachSelf=true -javaagent:E:\Project\JavaProject\HuHoBot\HuHoBotKotlin\.gradle\architectury\architectury-transformer-agent.jar"/>
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/server\Architectury\fabric/run/"/>
+    <method v="2">
+      <option enabled="true" name="Make"/>
+    </method>
+    <envs>
+      
+    </envs>
+    <shortenClasspath name="ARGS_FILE"/>
+  <classpathModifications/></configuration>
+</component>

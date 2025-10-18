@@ -1,0 +1,14 @@
+name: HuHoBot
+version: '${version}'
+main: cn.huohuas001.huhobot.spigot.HuHoBotSpigot
+api-version: 1.16
+folia-supported: true
+authors:
+  - "HuoHuas001"
+description: HuHoBot Spigot Adapter
+commands:
+  huhobot:
+    description: HuHoBot's control command
+    usage: /huhobot
+softdepend:
+  - "PlaceholderAPI"

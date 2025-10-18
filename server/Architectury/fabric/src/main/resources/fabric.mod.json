@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "huhobot",
+  "version": "${version}",
+  "name": "HuHoBot",
+  "description": "HuHoBot Fabric Adapter",
+  "authors": [
+    "HuoHuas001"
+  ],
+  "contact": {
+    "homepage": "https://huhobot.txssb.cn/",
+    "sources": "https://github.com/HuHoBot/FabricAdapter"
+  },
+  "license": "GPL-v3",
+  "icon": "assets/huhobot/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "cn.huohuas001.huhobot.mod.fabric.ModFabric"
+    ]
+  },
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.20.1",
+    "architectury": ">=9.1.12"
+  }
+}

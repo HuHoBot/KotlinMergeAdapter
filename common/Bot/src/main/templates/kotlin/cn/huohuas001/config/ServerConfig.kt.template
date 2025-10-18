@@ -1,0 +1,4 @@
+package cn.huohuas001.config;
+
+val WS_SERVER_URL:String = "${WS_SERVER_URL}";
+
