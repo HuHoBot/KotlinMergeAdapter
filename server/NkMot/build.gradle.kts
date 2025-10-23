@@ -58,6 +58,10 @@ java {
     }
 }
 
+kotlin {
+    jvmToolchain(targetJavaVersion) // 或者 21，取决于你想使用的版本
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
