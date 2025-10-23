@@ -59,7 +59,7 @@ jobs:
           WS_SERVER_URL: ${{ secrets.WS_SERVER_URL }}
         run: |
           ./gradlew buildAndGather \
-            -PwsServerUrl="$ " \
+            -PwsServerUrl="$WS_SERVER_URL" \
             -x test \
             -Dorg.gradle.daemon=false
 
