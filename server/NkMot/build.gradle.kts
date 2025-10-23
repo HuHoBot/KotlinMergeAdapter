@@ -53,6 +53,9 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
     }
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(targetJavaVersion)) // 与Kotlin保持一致
+    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
