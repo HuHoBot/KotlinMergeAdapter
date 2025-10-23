@@ -55,7 +55,6 @@ object HuHoBotMod: HuHoBot {
 
             enableBot()
 
-
             //启动调度器
             scheduler = HuHoBotScheduler(this)
             scheduler.startScheduler()
@@ -67,11 +66,19 @@ object HuHoBotMod: HuHoBot {
     }
 
     override fun getQueryAllowList(): BaseEvent {
-        TODO("Not yet implemented")
+        return object: BaseEvent(){
+            override fun run(): Boolean {
+                return true
+            }
+        }
     }
 
     override fun getQueryOnline(): BaseEvent {
-        TODO("Not yet implemented")
+        return object: BaseEvent(){
+            override fun run(): Boolean {
+                return true
+            }
+        }
     }
 
     override fun addWhiteList(playerName: String) {
@@ -129,7 +136,7 @@ object HuHoBotMod: HuHoBot {
     }
 
     override fun getPluginVersion(): String {
-        return ExpectPlatform.getModVersion(MOD_ID)
+        return "0.0.0"
     }
 
     override fun loadCustomCommand() {

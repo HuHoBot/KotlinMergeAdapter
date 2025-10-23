@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import kotlin.text.set
 
 plugins {
     kotlin("jvm") version "2.2.0"
@@ -8,7 +9,7 @@ plugins {
 
 group = "cn.huohuas001.huhobot"
 description = "HuHoBot Allay Adapter"
-version = "0.1.1"
+version = "0.1.2"
 
 java {
     toolchain {
@@ -35,5 +36,5 @@ dependencies {
 
 
 tasks.shadowJar {
-    archiveClassifier = "AllayMC"
+    archiveFileName.set("HuHoBot-${project.version}-AllayMC.jar")
 }

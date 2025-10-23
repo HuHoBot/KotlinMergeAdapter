@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "cn.huohuas001"
-version = "1.3.2"
+version = "1.3.3"
 
 repositories {
     maven("https://jitpack.io")

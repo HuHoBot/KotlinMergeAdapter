@@ -169,5 +169,10 @@ object ClientManager {
             val plugin = BotShared.getPlugin()
             currentTask = plugin.submitTimer(this.RECONNECT_DELAY * 20L, 0) { this.autoReconnect() }
         }
+        else if (currentTask != null){
+            currentTask!!.cancel()
+            currentTask = null
+            clientReconnect()
+        }
     }
 }
