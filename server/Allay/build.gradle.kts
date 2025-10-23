@@ -9,7 +9,6 @@ plugins {
 
 group = "cn.huohuas001.huhobot"
 description = "HuHoBot Allay Adapter"
-version = "0.1.2"
 
 java {
     toolchain {

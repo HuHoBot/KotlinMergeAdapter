@@ -16,6 +16,7 @@ class WsClient(private val plugin: HuHoBot, serverUri: URI) : WebSocketClient(se
 
     override fun onOpen(handshakedata: ServerHandshake) {
         plugin.log_info("服务端连接成功.")
+        ClientManager.cancelCurrentTask()
         shakeHand()
     }
 
@@ -36,7 +37,9 @@ class WsClient(private val plugin: HuHoBot, serverUri: URI) : WebSocketClient(se
 
     override fun onClose(code: Int, reason: String, remote: Boolean) {
         plugin.log_error("连接已断开,错误码:$code 错误信息:$reason")
-        ClientManager.clientReconnect()
+        if (code != 1000) { // 1000是正常关闭
+            ClientManager.clientReconnect()
+        }
     }
 
     override fun onError(ex: Exception) {

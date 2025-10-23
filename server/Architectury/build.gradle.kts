@@ -37,7 +37,6 @@ allprojects {
 
     base.archivesName.set(project.property("archives_base_name").toString())
     //base.archivesBaseName = rootProject.property("archives_base_name").toString()
-    version = project.property("mod_version").toString()
     group = project.property("maven_group").toString()
 
     repositories {

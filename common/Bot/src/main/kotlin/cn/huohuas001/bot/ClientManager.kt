@@ -16,6 +16,7 @@ object ClientManager {
     private var ReconnectAttempts = 0
     private var shouldReconnect = true
 
+    private val isReconnecting = java.util.concurrent.atomic.AtomicBoolean(false)
     private var currentTask: Cancelable? = null
     private var autoDisConnectTask: Cancelable? = null
 
@@ -30,11 +31,10 @@ object ClientManager {
      * 取消当前所有任务
      */
     fun cancelCurrentTask() {
-        if (currentTask != null) {
-            currentTask!!.cancel()
-            currentTask = null
-            ReconnectAttempts = 0
-        }
+        isReconnecting.set(false)
+        ReconnectAttempts = 0
+        currentTask?.cancel()
+        currentTask = null
     }
 
     fun shutdownClient(): Boolean {
@@ -67,20 +67,27 @@ object ClientManager {
     }
 
     fun connectServer(): Boolean {
-        val plugin = BotShared.getPlugin()
-        plugin.log_info(" 正在连接服务端...")
-        try {
-            val uri = URI(websocketUrl)
-            if(client == null || !client!!.isOpen){
-                client = WsClient(BotShared.getPlugin(),uri)
-                setShouldReconnect(true) // 设置是否重连
-                client!!.connect()
+        synchronized(this) {
+            val plugin = BotShared.getPlugin()
+            plugin.log_info(" 正在连接服务端...")
+            try {
+                val uri = URI(websocketUrl)
+                // 更严格的连接检查
+                if(client != null && client!!.isOpen){
+                    plugin.log_info(" 已存在活跃连接，无需重新连接")
+                    return true
+                }
+                if(client == null || !client!!.isOpen){
+                    client = WsClient(BotShared.getPlugin(), uri)
+                    setShouldReconnect(true) // 设置是否重连
+                    client!!.connect()
+                }
+                return true
+            } catch (e: URISyntaxException) {
+                plugin.log_error(e.stackTrace.toString())
             }
-            return true
-        } catch (e: URISyntaxException) {
-            plugin.log_error(e.stackTrace.toString())
+            return false
         }
-        return false
     }
 
     fun isOpen(): Boolean {
@@ -144,35 +151,71 @@ object ClientManager {
     }
 
     /**
-     * 客户端自动重连循环
+     * 执行重连逻辑
      */
-    private fun autoReconnect() {
-        synchronized(this) {
-            val plugin = BotShared.getPlugin()
+    private fun performReconnect() {
+        val plugin = BotShared.getPlugin()
+
+        while (shouldReconnect && ReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
             ReconnectAttempts++
-            if (ReconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-                plugin.log_warning(" 重连尝试已达到最大次数，将不再尝试重新连接。")
-                cancelCurrentTask()
-                return
+
+            // 检查是否已经有活跃连接
+            if (isOpen()) {
+                plugin.log_info("检测到已有活跃连接，停止重连")
+                break
             }
-            if (!shouldReconnect) {
-                cancelCurrentTask()
-                return
+
+            plugin.log_info("正在尝试重新连接,这是第($ReconnectAttempts/$MAX_RECONNECT_ATTEMPTS)次连接")
+
+            // 尝试连接
+            if (connectServer()) {
+                // 连接成功，等待一段时间确认连接稳定
+                Thread.sleep(1000)
+                if (isOpen()) {
+                    plugin.log_info("重连成功!")
+                    break
+                }
             }
-            plugin.log_info(" 正在尝试重新连接,这是第($ReconnectAttempts/$MAX_RECONNECT_ATTEMPTS)次连接")
-            this.connectServer()
+
+            // 如果不是最后一次尝试，等待后继续
+            if (ReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                try {
+                    Thread.sleep(RECONNECT_DELAY * 1000) // 等待重连延迟
+                } catch (e: InterruptedException) {
+                    break
+                }
+            }
         }
+
+        // 重连结束，无论成功与否都要重置状态
+        if (ReconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+            plugin.log_warning("重连尝试已达到最大次数，将不再尝试重新连接。")
+        }
+
+        isReconnecting.set(false)
+        ReconnectAttempts = 0
     }
 
     fun clientReconnect() {
-        if (shouldReconnect && currentTask == null) {
-            val plugin = BotShared.getPlugin()
-            currentTask = plugin.submitTimer(this.RECONNECT_DELAY * 20L, 0) { this.autoReconnect() }
+        // 使用CAS操作确保只有一个重连任务能启动
+        if (!isReconnecting.compareAndSet(false, true)) {
+            return // 已经有重连任务在运行
         }
-        else if (currentTask != null){
-            currentTask!!.cancel()
-            currentTask = null
-            clientReconnect()
+
+        if (!shouldReconnect) {
+            isReconnecting.set(false)
+            return
+        }
+
+        val plugin = BotShared.getPlugin()
+        ReconnectAttempts = 0 // 重置重连计数
+
+        // 直接执行第一次重连，而不是通过定时器延迟
+        plugin.submitLater(0) {
+            performReconnect()
         }
     }
+
+
+
 }

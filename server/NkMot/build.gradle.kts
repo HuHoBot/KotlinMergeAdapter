@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "cn.huohuas001"
-version = "1.0.8"
+//version = "1.0.8"
 val targetJavaVersion = 17
 
 repositories {

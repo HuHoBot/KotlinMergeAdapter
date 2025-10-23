@@ -7,6 +7,8 @@ import cn.huohuas001.bot.events.BindRequest
 import cn.huohuas001.bot.provider.ChatFormat
 import cn.huohuas001.bot.provider.Motd
 import cn.huohuas001.bot.tools.Cancelable
+import cn.huohuas001.huhobot.mod.events.QueryAllowList
+import cn.huohuas001.huhobot.mod.events.QueryOnline
 import cn.huohuas001.huhobot.mod.managers.CommandManager
 import cn.huohuas001.huhobot.mod.managers.ConfigManager
 import cn.huohuas001.huhobot.mod.tools.HuHoBotScheduler
@@ -53,32 +55,29 @@ object HuHoBotMod: HuHoBot {
             commandManager = CommandManager(this)
             commandManager.registerCommands(serverInstance.commands.dispatcher)
 
-            enableBot()
-
             //启动调度器
             scheduler = HuHoBotScheduler(this)
             scheduler.startScheduler()
+
+            enableBot()
         }
 
-        LifecycleEvent.SERVER_STOPPED.register{
-
+        LifecycleEvent.SERVER_STOPPING.register{
+            disable()
         }
+    }
+
+    fun disable(){
+        ClientManager.setShouldReconnect(false)
+        ClientManager.shutdownClient()
     }
 
     override fun getQueryAllowList(): BaseEvent {
-        return object: BaseEvent(){
-            override fun run(): Boolean {
-                return true
-            }
-        }
+        return QueryAllowList(this)
     }
 
     override fun getQueryOnline(): BaseEvent {
-        return object: BaseEvent(){
-            override fun run(): Boolean {
-                return true
-            }
-        }
+        return QueryOnline( this)
     }
 
     override fun addWhiteList(playerName: String) {

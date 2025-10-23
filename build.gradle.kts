@@ -54,7 +54,4 @@ allprojects {
         }
 }
 
-
-
-
 }

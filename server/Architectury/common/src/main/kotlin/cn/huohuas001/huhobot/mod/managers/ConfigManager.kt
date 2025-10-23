@@ -5,6 +5,7 @@ import cn.huohuas001.bot.provider.ChatFormat
 import cn.huohuas001.bot.provider.CustomCommandDetail
 import cn.huohuas001.bot.provider.Motd
 import cn.huohuas001.bot.provider.WhiteList
+import cn.huohuas001.bot.tools.getPackID
 import cn.huohuas001.huhobot.mod.ExpectPlatform
 import cn.huohuas001.huhobot.mod.HuHoBotMod
 import org.apache.logging.log4j.Logger
@@ -173,7 +174,12 @@ class ConfigManager(private val mod: HuHoBotMod) {
 
     // 2. serverId相关
     fun getServerId(): String {
-        return getString("serverId", "")
+        var serverId = getString("serverId", "")
+        if(serverId == ""){
+            serverId = getPackID()
+            setServerId(serverId)
+        }
+        return serverId
     }
 
     fun setServerId(serverId: String) {

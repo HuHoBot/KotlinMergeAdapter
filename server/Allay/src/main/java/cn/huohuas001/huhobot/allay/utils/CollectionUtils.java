@@ -16,15 +16,15 @@ public final class CollectionUtils {
      */
     public static <T> List<List<T>> chunkSet(Set<T> set, int size) {
         // 将Set转换为List
-        var list = new ArrayList<>(set);
+        List list = new ArrayList<>(set);
         // 使用chunkList方法进行分片
         return chunkList(list, size);
     }
 
     private static <T> List<List<T>> chunkList(List<T> list, int size) {
-        var chunks = new ArrayList<List<T>>();
+        List chunks = new ArrayList<List<T>>();
         for (int i = 0; i < list.size(); i += size) {
-            var chunk = list.subList(i, Math.min(i + size, list.size()));
+            List chunk = list.subList(i, Math.min(i + size, list.size()));
             chunks.add(chunk);
         }
         return chunks;
