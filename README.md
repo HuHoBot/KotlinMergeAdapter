@@ -20,7 +20,9 @@
 ### 核心功能
 
 - **无缝绑定**：通过WebSocket实现服务器与控制端即时绑定
-- **跨平台支持**：适配Spigot/Paper 1.8+ 全版本
+- **多平台支持**：适配Spigot/Paper 1.8+ 全版本
+- **多平台支持**: 支持Nukkit/Allay/
+- **多平台支持**: 支持Forge/Fabric
 - **智能风控规避**：基于事件驱动的非侵入式通信协议
 - **支持Folia**: 支持Folia服务端运行
 
@@ -60,7 +62,6 @@
 - AllayMC: Java `21+` Runtime
 - **任意支持的 Spigot/Paper 核心**（包括但不限于 1.8+ 版本）
 - **Architectury支持的 Forge/Fabric(0.16.5+) 核心**
-- 
 
 ### 快速开始
 
