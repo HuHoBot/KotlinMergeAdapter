@@ -138,6 +138,10 @@ object HuHoBotMod: HuHoBot {
         return "0.0.0"
     }
 
+    override fun getCallbackConvertImg(): Int {
+        return config.getCallbackConvertImg()
+    }
+
     override fun loadCustomCommand() {
         config.loadCommandsFromConfig()
     }

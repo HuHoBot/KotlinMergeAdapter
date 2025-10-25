@@ -2,6 +2,7 @@ package cn.huohuas001.huhobot.spigot.manager
 
 import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.provider.CustomCommandDetail
+import cn.huohuas001.bot.tools.getPackID
 import cn.huohuas001.huhobot.spigot.HuHoBotSpigot
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -15,7 +16,13 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
 
     private val configFile: File = File(plugin.dataFolder, "config.yml")
     private val oldConfigFile: File = File(plugin.dataFolder, "config_old.yml")
-    private val version: Int = 3
+    private val version: Int = 4
+
+    init {
+        if (checkConfig()) {
+            migrateConfig()
+        }
+    }
 
     // 检查是否需要修改配置文件
     fun checkConfig(): Boolean {
@@ -26,26 +33,15 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
         return true
     }
 
-    // 迁移服务器 URL
-    private fun migrateServerUrl(oldConfig: FileConfiguration, newConfig: FileConfiguration) {
-        if (oldConfig.contains("motd.server_url") || oldConfig.contains("motdUrl")) {
-            val oldUrl = oldConfig.getString("motd.server_url") ?: oldConfig.getString("motdUrl")
-            val parts = oldUrl?.split(":")
-            val ip = parts?.let { if (it.isNotEmpty()) parts[0] else "localhost" }
-            var port = 25565 // 默认端口
-            try {
-                parts?.let {
-                    if (it.size > 1) {
-                        port = parts[1].toInt()
-                    }
-                }
-            } catch (e: NumberFormatException) {
-                parts?.let { plugin.pluginLogger.warning("无效的端口号: ${it[1]}，已使用默认 25565") }
-            }
-            newConfig.set("motd.server_ip", ip)
-            newConfig.set("motd.server_port", port)
-            plugin.pluginLogger.info("已迁移 MOTD 地址: $oldUrl → $ip:$port")
+    // 添加从版本3到版本4的迁移方法
+    private fun migrateFromV3ToV4(oldConfig: FileConfiguration, newConfig: FileConfiguration) {
+        // 添加新的 callbackConvertImg 配置项，默认值为0
+        if (!newConfig.contains("callbackConvertImg")) {
+            newConfig.set("callbackConvertImg", 0)
+            plugin.pluginLogger.info("已添加新的配置项: callbackConvertImg = 0")
         }
+
+        // 可以在这里添加其他从版本3到版本4的迁移逻辑
     }
 
     fun migrateConfig() {
@@ -65,35 +61,23 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
             // 3. 迁移旧配置数据
             if (oldConfigFile.exists()) {
                 val oldConfig = YamlConfiguration.loadConfiguration(oldConfigFile)
+                val oldVersion = if (oldConfig.contains("version")) oldConfig.getInt("version") else -1
 
-                // 使用类型安全的迁移方法
-                migrateValue(oldConfig, newConfig, "serverId")
-                migrateValue(oldConfig, newConfig, "hashKey")
-
-                // 迁移聊天格式
-                migrateNested(oldConfig, newConfig, "chatFormatGame", "chatFormat.from_game")
-                migrateNested(oldConfig, newConfig, "chatFormat.from_game", "chatFormat.from_game")
-                migrateNested(oldConfig, newConfig, "chatFormatGroup", "chatFormat.from_group")
-                migrateNested(oldConfig, newConfig, "chatFormat.from_group", "chatFormat.from_group")
-                if (!newConfig.contains("chatFormat.post_chat")) {
-                    newConfig.set("chatFormat.post_chat", true) // 设置默认值
-                }
-                if (!newConfig.contains("chatFormat.post_prefix")) {
-                    newConfig.set("chatFormat.post_prefix", "") // 设置默认值
-                }
-
-                // 迁移 MOTD 设置
-                migrateServerUrl(oldConfig, newConfig)
-
-                // 迁移白名单命令
-                migrateNested(oldConfig, newConfig, "addWhiteListCmd", "whiteList.add")
-                migrateNested(oldConfig, newConfig, "whiteList.add", "whiteList.add")
-                migrateNested(oldConfig, newConfig, "delWhiteListCmd", "whiteList.del")
-                migrateNested(oldConfig, newConfig, "whiteList.del", "whiteList.del")
-
-                // 迁移自定义命令（保持结构不变）
-                if (oldConfig.isConfigurationSection("customCommand")) {
-                    newConfig.set("customCommand", oldConfig.get("customCommand"))
+                // 根据旧版本号执行相应的迁移
+                when (oldVersion) {
+                    3 -> {
+                        // 从版本3迁移到版本4
+                        migrateFromV3ToV4(oldConfig, newConfig)
+                        plugin.pluginLogger.info("配置文件从版本3升级到版本4完成")
+                    }
+                    // 如果还有其他旧版本，可以继续添加
+                    in 0..2 -> {
+                        // 对于更旧的版本，可以复用之前的迁移逻辑或直接使用默认配置
+                        plugin.pluginLogger.warning("检测到较旧的配置版本($oldVersion)，将使用默认配置")
+                    }
+                    else -> {
+                        plugin.pluginLogger.info("未找到需要迁移的配置项")
+                    }
                 }
 
                 plugin.pluginLogger.info("配置文件迁移完成")
@@ -103,25 +87,6 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
         } catch (e: IOException) {
             plugin.pluginLogger.severe("配置文件迁移失败: ${e.message}")
             plugin.pluginLogger.severe(e.stackTraceToString())
-        }
-    }
-
-    private fun migrateValue(oldConfig: FileConfiguration, newConfig: FileConfiguration, path: String) {
-        if (oldConfig.contains(path)) {
-            val value = oldConfig.get(path)
-            if (!newConfig.contains(path)) {
-                newConfig.set(path, value)
-            }
-        }
-    }
-
-    private fun migrateNested(oldConfig: FileConfiguration, newConfig: FileConfiguration,
-                              oldPath: String, newPath: String) {
-        if (oldConfig.contains(oldPath)) {
-            val value = oldConfig.get(oldPath)
-            if (!newConfig.contains(newPath)) {
-                newConfig.set(newPath, value)
-            }
         }
     }
 
@@ -166,7 +131,12 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
 
     fun getServerId(): String {
         val config = plugin.config
-        return config.getString("serverId")?:""
+        var serverId = config.getString("serverId")?:""
+        if(serverId.isEmpty()){
+            serverId = getPackID()
+            setServerId(serverId)
+        }
+        return serverId
     }
 
     fun setServerId(serverId: String) {

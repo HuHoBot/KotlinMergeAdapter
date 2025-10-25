@@ -43,7 +43,11 @@ dependencies {
     common(project(":server-Architectury:common", "namedElements")) { isTransitive = false }
     shadowCommon(project(":server-Architectury:common", "transformProductionForge")) { isTransitive = false }
     shadowCommon("org.yaml:snakeyaml:2.5")
-    shadowCommon("org.java-websocket:Java-WebSocket:1.5.4")
+
+    shadowCommon("io.ktor:ktor-client-websockets:2.3.10")
+    shadowCommon("io.ktor:ktor-client-cio:2.3.10")
+    shadowCommon("io.ktor:ktor-client-core:2.3.10")
+
     shadowCommon("com.alibaba.fastjson2:fastjson2:2.0.52")
     shadowCommon(project(":common-Bot")) { isTransitive = false }
 
@@ -73,6 +77,22 @@ tasks.shadowJar {
     exclude("architectury.common.json")
     configurations = listOf(shadowCommon)
     archiveFileName.set("HuHoBot-${project.version}-Forge_devShadow.jar")
+
+    // 去除重复文件（只需在这里配置一次）
+    mergeServiceFiles()
+
+    // 其他优化选项
+    exclude("**/*.md")
+    exclude("**/*.txt")
+    exclude("META-INF/maven/**")
+    exclude("META-INF/LICENSE**")
+    exclude("org/slf4j/**")
+    exclude("org/yaml/**")
+    exclude("org/jetbrains/**")
+    exclude("META-INF/versions/**")
+    exclude("META-INF/proguard/**")
+    exclude("META-INF/native-image/**")
+    exclude("META-INF/scm/**")
 }
 
 tasks.remapJar {
@@ -80,6 +100,19 @@ tasks.remapJar {
     inputFile.set(tasks.shadowJar.flatMap { it.archiveFile })
     dependsOn(tasks.shadowJar)
     archiveFileName.set("HuHoBot-${project.version}-Forge.jar")
+
+    // 其他优化选项
+    exclude("**/*.md")
+    exclude("**/*.txt")
+    exclude("META-INF/maven/**")
+    exclude("META-INF/LICENSE**")
+    exclude("org/slf4j/**")
+    exclude("org/yaml/**")
+    exclude("org/jetbrains/**")
+    exclude("META-INF/versions/**")
+    exclude("META-INF/proguard/**")
+    exclude("META-INF/native-image/**")
+    exclude("META-INF/scm/**")
 }
 
 tasks.jar {

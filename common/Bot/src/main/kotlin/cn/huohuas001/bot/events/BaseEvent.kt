@@ -16,8 +16,7 @@ open class BaseEvent {
     }
 
     fun respone(msg: String, type: String) {
-        val client: WsClient = ClientManager.getClient()
-        client.respone(msg, type, mPackId)
+        ClientManager.postRespone(msg, type, mPackId)
     }
 
     fun sendMessage(type: String, body: JSONObject) {
@@ -29,8 +28,7 @@ open class BaseEvent {
         val plugin = BotShared.getPlugin()
         plugin.submit{
             val ret:String = plugin.sendCommand(command)
-            val client: WsClient = ClientManager.getClient()
-            client.respone("已执行.\n$ret", "success", mPackId);
+            ClientManager.postRespone("已执行.\n$ret", "success", mPackId);
         }
     }
 

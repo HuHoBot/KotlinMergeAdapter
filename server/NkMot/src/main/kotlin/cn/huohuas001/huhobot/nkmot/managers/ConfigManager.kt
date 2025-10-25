@@ -9,11 +9,10 @@ import java.io.File
 
 class ConfigManager(private val plugin: HuHoBotNkMot) {
     private val config: Config
-    private val currentVersion = 2
+    private val currentVersion = 3
 
     // 根配置项
-    var serverId: String
-        private set
+    private var serverId: String
     var hashKey: String
         private set
     val chatFormat: ChatFormatConfig
@@ -21,6 +20,8 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
     var customCommands: List<CustomCommand>
         private set
     var version: Int
+        private set
+    var callbackConvertImg: Int
         private set
 
     init {
@@ -56,6 +57,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
                         put("permission", 1)
                     }
                 ))
+                put("callbackConvertImg",0)
                 put("version", 1)
             }
         )
@@ -68,10 +70,11 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
         customCommands = config.getMapList("customCommand").map { section ->
             CustomCommand(section as ConfigSection)
         }
+        callbackConvertImg = config.getInt("callbackConvertImg",0)
         version = config.getInt("version", 0) // 带默认值读取
 
         if (version < currentVersion) {
-            migrateToV2()
+            migrateToV3()
         }
     }
 
@@ -103,6 +106,14 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
     }
     // endregion
 
+    fun getServerId(): String {
+        if(serverId.isEmpty()){
+            serverId = getPackID()
+            setServerId(serverId)
+        }
+        return serverId
+    }
+
     fun setServerId(serverId: String): ConfigManager {
         this.serverId = serverId
         config.set("serverId", serverId) // 同步更新配置
@@ -123,20 +134,13 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
     }
 
     // 新增迁移方法
-    private fun migrateToV2() {
-        // 处理 chatFormat 配置升级
-        val chatFormatSection = config.getSection("chatFormat")
-        if (!chatFormatSection.exists("post_chat")) {
-            chatFormatSection.put("post_chat", true) // 添加默认值
-        }
-        if (!chatFormatSection.exists("post_prefix")) {
-            chatFormatSection.put("post_prefix", "") // 添加默认值
-        }
+    private fun migrateToV3() {
+        this.callbackConvertImg = 0
 
         // 更新版本号
-        config.set("version", 2)
+        config.set("version", 3)
         config.save() // 立即保存迁移结果
 
-        version = 2 // 更新内存中的版本号
+        version = 3 // 更新内存中的版本号
     }
 }

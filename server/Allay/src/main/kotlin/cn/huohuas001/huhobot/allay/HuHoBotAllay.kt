@@ -154,6 +154,10 @@ class HuHoBotAllay: Plugin(), HuHoBot {
         return getPluginContainer().descriptor().version
     }
 
+    override fun getCallbackConvertImg(): Int {
+        return config.callbackConvertImg
+    }
+
     override fun loadCustomCommand() {
         val commands = config.customCommandMap
 

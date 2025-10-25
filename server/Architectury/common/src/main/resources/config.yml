@@ -19,6 +19,8 @@ whiteList:
   add: "whitelist add {name}"
   del: "whitelist remove {name}"
 
+callbackConvertImg: 0
+
 customCommand:
   - key: "加白名"
     command: "whitelist add &1"
@@ -26,3 +28,5 @@ customCommand:
   - key: "管理加白名"
     command: "whitelist add &1"
     permission: 1
+
+version: 1

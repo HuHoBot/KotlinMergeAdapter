@@ -9,10 +9,19 @@ java {
 }
 
 dependencies {
-    implementation("org.java-websocket:Java-WebSocket:1.5.4")
-    implementation("com.alibaba.fastjson2:fastjson2:2.0.52")
+    implementation("io.ktor:ktor-client-websockets:2.3.10")
+    implementation("io.ktor:ktor-client-java:2.3.10")
+    implementation("io.ktor:ktor-client-core:2.3.10") {
+        exclude(group = "org.slf4j")
+        exclude(group = "org.yaml")
+    }
+
+    implementation("com.alibaba.fastjson2:fastjson2:2.0.52") {
+        exclude(group = "org.jetbrains")
+    }
     implementation(kotlin("stdlib"))
 }
+
 
 tasks.register<Copy>("generateServerConfig") {
     group = "Build"

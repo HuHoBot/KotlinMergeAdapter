@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "cn.huohuas001"
-
+val shadowCommon: Configuration by configurations.creating
 
 repositories {
     maven("https://jitpack.io")
@@ -25,7 +25,24 @@ dependencies {
     implementation("com.github.Anon8281:UniversalScheduler:0.1.6")
     implementation("com.alibaba.fastjson2:fastjson2:2.0.52")
 
+    implementation("com.alibaba.fastjson2:fastjson2:2.0.52") {
+        exclude(group = "org.jetbrains")
+    }
+
+    shadowCommon("com.alibaba.fastjson2:fastjson2:2.0.52")
+    shadowCommon("com.github.Anon8281:UniversalScheduler:0.1.6")
+
+    shadowCommon("io.ktor:ktor-client-websockets:2.3.10")
+    shadowCommon("io.ktor:ktor-client-java:2.3.10")
+    shadowCommon("io.ktor:ktor-client-core:2.3.10") {
+        exclude(group = "org.slf4j")
+    }
+    shadowCommon("com.alibaba.fastjson2:fastjson2:2.0.52") {
+        exclude(group = "org.jetbrains")
+    }
+
     implementation(project(":common-Bot"))
+    shadowCommon(project(":common-Bot"))
     implementation(kotlin("stdlib"))
 }
 
@@ -37,9 +54,24 @@ tasks.jar {
 }
 
 tasks.shadowJar {
+    configurations = listOf(shadowCommon)
     archiveFileName.set("HuHoBot-${project.version}-Spigot.jar")
     relocate("com.github.Anon8281.universalScheduler", "cn.huohuas001.huHoBot.spigot.universalScheduler")
-    minimize()
+    // 去除重复文件（只需在这里配置一次）
+    mergeServiceFiles()
+
+    // 其他优化选项
+    exclude("**/*.md")
+    exclude("**/*.txt")
+    exclude("META-INF/maven/**")
+    exclude("META-INF/LICENSE**")
+    exclude("org/slf4j/**")
+    exclude("org/yaml/**")
+    exclude("org/jetbrains/**")
+    exclude("META-INF/versions/**")
+    exclude("META-INF/proguard/**")
+    exclude("META-INF/native-image/**")
+    exclude("META-INF/scm/**")
 }
 
 val targetJavaVersion = 8
@@ -49,8 +81,6 @@ java {
     targetCompatibility = javaVersion
     toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
 }
-
-
 
 tasks.processResources {
     val props = mapOf("version" to version)

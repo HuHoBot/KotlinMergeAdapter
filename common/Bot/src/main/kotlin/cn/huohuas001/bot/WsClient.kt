@@ -1,51 +1,103 @@
 package cn.huohuas001.bot
 
-//import cn.huohuas001.huHoBot.Tools.ConfigManager
-//import cn.huohuas001.huHoBot.Tools.PackId
 import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.tools.getPackID
 import com.alibaba.fastjson2.JSON
 import com.alibaba.fastjson2.JSONObject
-import org.java_websocket.client.WebSocketClient
-import org.java_websocket.handshake.ServerHandshake
+import io.ktor.client.*
+import io.ktor.client.plugins.websocket.*
+import io.ktor.websocket.*
+import kotlinx.coroutines.*
 import java.net.URI
 import java.util.concurrent.CompletableFuture
+import kotlin.coroutines.CoroutineContext
 
-class WsClient(private val plugin: HuHoBot, serverUri: URI) : WebSocketClient(serverUri){
+class WsClient(private val plugin: HuHoBot, val serverUri: URI) : CoroutineScope {
     private val responseFutureList = mutableMapOf<String, CompletableFuture<JSONObject>>()
-
-    override fun onOpen(handshakedata: ServerHandshake) {
-        plugin.log_info("服务端连接成功.")
-        ClientManager.cancelCurrentTask()
-        shakeHand()
+    private val client: HttpClient = HttpClient {
+        install(WebSockets)
     }
+    private var webSocketSession: DefaultClientWebSocketSession? = null
+    private val job = Job()
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
 
-    override fun onMessage(message: String) {
-        val jsonData = JSON.parseObject(message)
-        val header = jsonData.getJSONObject("header")
-        val packId = header.getString("id")
-        val plugin = BotShared.getPlugin()
+    /**
+     * 建立WebSocket连接
+     */
+    fun connect() {
+        launch {
+            try {
+                val url = serverUri.toString()
+                client.webSocket(url) {
+                    webSocketSession = this
+                    plugin.log_info("服务端连接成功.")
+                    ClientManager.cancelCurrentTask()
 
-        if (responseFutureList.containsKey(packId)) {
-            val responseFuture = responseFutureList[packId]
-            responseFuture?.takeIf { !it.isDone }?.complete(jsonData)
-            responseFutureList.remove(packId)
-        } else {
-            plugin.onMessage(jsonData)
+                    // 发送握手消息
+                    shakeHand()
+
+                    // 处理接收消息
+                    try {
+                        for (frame in incoming) {
+                            when (frame) {
+                                is Frame.Text -> {
+                                    val message = frame.readText()
+                                    handleMessage(message)
+                                }
+                                else -> {
+                                    // 忽略其他类型的消息帧
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        plugin.log_error("消息处理异常: ${e.message}")
+                    } finally {
+                        // 连接断开时的处理
+                        handleConnectionClosed()
+                    }
+                }
+            } catch (e: Exception) {
+                plugin.log_error("连接失败: ${e.message}")
+                ClientManager.clientReconnect()
+            }
         }
     }
 
-    override fun onClose(code: Int, reason: String, remote: Boolean) {
-        plugin.log_error("连接已断开,错误码:$code 错误信息:$reason")
-        if (code != 1000) { // 1000是正常关闭
-            ClientManager.clientReconnect()
+    /**
+     * 处理接收到的消息
+     */
+    private fun handleMessage(message: String) {
+        try {
+            val jsonData = JSON.parseObject(message)
+            val header = jsonData.getJSONObject("header")
+            val packId = header.getString("id")
+
+            if (responseFutureList.containsKey(packId)) {
+                val responseFuture = responseFutureList[packId]
+                responseFuture?.takeIf { !it.isDone }?.complete(jsonData)
+                responseFutureList.remove(packId)
+            } else {
+                plugin.onMessage(jsonData)
+            }
+        } catch (e: Exception) {
+            plugin.log_error("消息解析失败: ${e.message}")
         }
     }
 
-    override fun onError(ex: Exception) {
-        plugin.log_error(ex.printStackTrace().toString())
+    /**
+     * 处理连接断开
+     */
+    private fun handleConnectionClosed() {
+        plugin.log_error("连接已断开")
         ClientManager.clientReconnect()
     }
+
+    /**
+     * 检查连接是否打开
+     */
+    val isOpen: Boolean
+        get() = webSocketSession?.isActive == true
 
     /**
      * 向服务端发送一条消息
@@ -66,15 +118,21 @@ class WsClient(private val plugin: HuHoBot, serverUri: URI) : WebSocketClient(se
      * @param packId 消息Id
      */
     fun sendMessage(type: String, body: JSONObject, packId: String) {
-        val data = JSONObject()
-        val header = JSONObject()
-        header["type"] = type
-        header["id"] = packId
-        data["header"] = header
-        data["body"] = body
+        launch {
+            try {
+                val data = JSONObject()
+                val header = JSONObject()
+                header["type"] = type
+                header["id"] = packId
+                data["header"] = header
+                data["body"] = body
 
-        if (this.isOpen) {
-            this.send(data.toJSONString())
+                if (isOpen) {
+                    webSocketSession?.send(Frame.Text(data.toJSONString()))
+                }
+            } catch (e: Exception) {
+                plugin.log_error("发送消息失败: ${e.message}")
+            }
         }
     }
 
@@ -99,7 +157,7 @@ class WsClient(private val plugin: HuHoBot, serverUri: URI) : WebSocketClient(se
      * @return 消息回报体
      */
     fun sendRequestAndAwaitResponse(type: String, body: JSONObject, packId: String): CompletableFuture<JSONObject> {
-        if (this.isOpen) {
+        if (isOpen) {
             //打包数据并发送
             val data = JSONObject()
             val header = JSONObject()
@@ -107,11 +165,20 @@ class WsClient(private val plugin: HuHoBot, serverUri: URI) : WebSocketClient(se
             header["id"] = packId
             data["header"] = header
             data["body"] = body
-            this.send(data.toJSONString())
 
-            //存储回报
+            // 存储回报
             val responseFuture = CompletableFuture<JSONObject>()
             responseFutureList[packId] = responseFuture
+
+            // 发送消息
+            launch {
+                try {
+                    webSocketSession?.send(Frame.Text(data.toJSONString()))
+                } catch (e: Exception) {
+                    responseFuture.completeExceptionally(e)
+                    responseFutureList.remove(packId)
+                }
+            }
 
             return responseFuture
         } else {
@@ -125,9 +192,9 @@ class WsClient(private val plugin: HuHoBot, serverUri: URI) : WebSocketClient(se
      * @param msg  回报消息
      * @param type 回报类型：success|error
      */
-    fun respone(msg: String, type: String) {
+    fun respone(msg: String, type: String,callbackConvert: Int) {
         val newPackId = getPackID()
-        respone(msg, type, newPackId)
+        respone(msg, type,callbackConvert, newPackId)
     }
 
     /**
@@ -137,9 +204,10 @@ class WsClient(private val plugin: HuHoBot, serverUri: URI) : WebSocketClient(se
      * @param type   回报类型：success|error
      * @param packId 回报Id
      */
-    fun respone(msg: String, type: String, packId: String) {
+    fun respone(msg: String, type: String,callbackConvert: Int, packId: String) {
         val body = JSONObject()
         body["msg"] = msg
+        body["callbackConvert"] = callbackConvert
         sendMessage(type, body, packId)
     }
 
@@ -154,5 +222,16 @@ class WsClient(private val plugin: HuHoBot, serverUri: URI) : WebSocketClient(se
         body["version"] = plugin.getPluginVersion()
         body["platform"] = plugin.getPlatform()
         sendMessage("shakeHand", body)
+    }
+
+    /**
+     * 关闭连接
+     */
+    fun close(code: Int = 1000, reason: String = "") {
+        launch {
+            webSocketSession?.close(CloseReason(code.toShort(), reason))
+            client.close()
+            job.cancel()
+        }
     }
 }

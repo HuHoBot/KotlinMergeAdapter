@@ -1,6 +1,7 @@
-# HuHoBot-Adapter v2.0.0
+# HuHoBot-Adapter v2.0.1
+
 ## Forge/Fabric:需要安装前置：architectury和fabric-language-kotlin或forge-language-kotlin
 
-- **Common**-fix(Timer): 修复一瞬间会触发多次连接的问题
-- **Architectury**-fix(Events): 修复事件QueryAllowList和QueryOnline不能正常使用的问题
+- **Common**-feat(core): 升级网络库并优化构建配置
+- **Common**-feat(core): 更新配置文件版本并添加新字段 callbackConvertImg
 

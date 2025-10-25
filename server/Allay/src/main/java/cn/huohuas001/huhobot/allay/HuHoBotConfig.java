@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("ALL")
 public class HuHoBotConfig extends OkaeriConfig {
     @Exclude
-    private static final int CURRENT_VERSION = 2;
+    private static final int CURRENT_VERSION = 3;
 
     // region Getters & Setters
     // region 核心配置
@@ -68,6 +68,11 @@ public class HuHoBotConfig extends OkaeriConfig {
     @Comment("服务器显示名称")
     public String serverName = "AllayMC";
 
+    // region 命令回调
+    @Getter
+    @Comment("需要命令回调转图片的行数(0代表不转)")
+    public int callbackConvertImg = 0;
+
     // region 自定义命令
     @Getter
     @Comment("自定义命令列表")
@@ -78,9 +83,9 @@ public class HuHoBotConfig extends OkaeriConfig {
     // endregion
 
     // 在PluginConfig类顶部添加版本字段
-    @Comment("配置版本 (检测到版本小于1时会自动迁移旧配置)")
+    @Comment("配置版本")
     @CustomKey("version")
-    private int configVersion = 1;
+    private int configVersion = 2;
     // endregion
 
     // 废弃原有motdUrl字段
@@ -131,8 +136,10 @@ public class HuHoBotConfig extends OkaeriConfig {
         }
         this.chatFormatGroup = null; // 清除旧字段
 
+        this.callbackConvertImg = 0;
 
-        this.configVersion = 2; // 更新版本号
+
+        this.configVersion = 3; // 更新版本号
     }
     // endregion
 

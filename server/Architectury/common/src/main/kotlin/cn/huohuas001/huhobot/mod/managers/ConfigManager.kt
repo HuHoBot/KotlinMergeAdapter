@@ -23,6 +23,9 @@ class ConfigManager(private val mod: HuHoBotMod) {
     private val configDir: File
     private val configFile: File
     private var config: MutableMap<String, Any> = mutableMapOf()
+    companion object {
+        private const val CURRENT_CONFIG_VERSION = 1
+    }
 
     init {
         // 配置目录：服务器根目录/config/huhobot
@@ -37,6 +40,9 @@ class ConfigManager(private val mod: HuHoBotMod) {
 
         // 加载默认配置
         loadDefaultConfig()
+
+        // 检查并转换配置版本
+        checkAndConvertConfig()
 
         // 读取配置到内存
         reloadConfig()
@@ -82,10 +88,50 @@ class ConfigManager(private val mod: HuHoBotMod) {
             val input = FileInputStream(configFile)
             config = yaml.load<MutableMap<String, Any>>(input) ?: mutableMapOf()
             input.close()
+
+            // 检查并转换配置版本
+            checkAndConvertConfig()
+
             logger.info("配置加载完成")
         } catch (e: IOException) {
             logger.error("加载配置失败$e")
             config = mutableMapOf()
+        }
+    }
+
+    // 添加配置版本检查和转换方法
+    private fun checkAndConvertConfig() {
+        val configVersion = getInt("version", 0)
+
+        // 如果配置版本小于当前版本，则执行转换
+        if (configVersion < CURRENT_CONFIG_VERSION) {
+            logger.info("检测到旧版配置文件，正在进行升级转换...")
+
+            // 执行版本转换
+            convertConfigToLatestVersion(configVersion)
+
+            // 更新配置版本号
+            setConfigValueByPath("version", CURRENT_CONFIG_VERSION)
+
+            // 保存更新后的配置
+            saveConfig()
+
+            logger.info("配置文件升级完成，当前版本：$CURRENT_CONFIG_VERSION")
+        }
+    }
+
+    // 配置转换实现方法
+    private fun convertConfigToLatestVersion(oldVersion: Int) {
+        when (oldVersion) {
+            0 -> {
+                // 从版本0升级到版本1
+                // 添加新的 callbackConvertImg 配置项
+                if (getConfigValueByPath("callbackConvertImg") == null) {
+                    setConfigValueByPath("callbackConvertImg", 0)
+                }
+
+                // 可以在这里添加其他从版本0到版本1的转换逻辑
+            }
         }
     }
 
@@ -259,6 +305,10 @@ class ConfigManager(private val mod: HuHoBotMod) {
             commandMap[key] = CustomCommandDetail(key, commandString, permission)
         }
         BotShared.customCommandMap = commandMap
+    }
+
+    fun getCallbackConvertImg(): Int{
+        return getInt("callbackConvertImg", 0)
     }
 
     // ------------------------------ 通用类型Get方法（供扩展） ------------------------------

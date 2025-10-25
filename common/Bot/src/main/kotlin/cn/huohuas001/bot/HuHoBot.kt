@@ -120,4 +120,5 @@ interface HuHoBot: LoggerProvider, ConfigProvider, CommandProvider, SchedulerPro
 
     fun addWhiteList(playerName: String)
     fun delWhiteList(playerName: String)
+    fun getCallbackConvertImg(): Int
 }

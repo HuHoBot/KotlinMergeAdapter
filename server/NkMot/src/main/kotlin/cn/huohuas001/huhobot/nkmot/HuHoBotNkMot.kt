@@ -33,7 +33,7 @@ class HuHoBotNkMot: PluginBase(), HuHoBot {
         this.server.commandMap.register("huhobot", HuHoBotCommand(this))
 
         //生成serverId
-        if (config.serverId.isEmpty() || config.serverId === "null") {
+        if (config.getServerId().isEmpty() || config.getServerId() === "null") {
             config.setServerId(getPackID())
             config.save()
         }
@@ -104,7 +104,7 @@ class HuHoBotNkMot: PluginBase(), HuHoBot {
     }
 
     override fun getServerId(): String {
-        return config.serverId
+        return config.getServerId()
     }
 
     override fun setServerId(serverId: String) {
@@ -125,6 +125,10 @@ class HuHoBotNkMot: PluginBase(), HuHoBot {
 
     override fun getPluginVersion(): String {
         return description.version
+    }
+
+    override fun getCallbackConvertImg(): Int {
+        return config.callbackConvertImg
     }
 
     override fun loadCustomCommand() {

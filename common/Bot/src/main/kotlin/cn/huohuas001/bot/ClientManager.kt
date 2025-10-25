@@ -143,11 +143,15 @@ object ClientManager {
     }
 
     fun postRespone(msg: String,type: String,packId: String){
-        client?.respone(msg,type,packId)
+        val plugin = BotShared.getPlugin()
+        val callbackConvert = plugin.getCallbackConvertImg()
+        client?.respone(msg,type,callbackConvert,packId)
     }
 
     fun postRespone(msg: JSONObject,type: String,packId: String){
-        client?.respone(msg.toJSONString(),type)
+        val plugin = BotShared.getPlugin()
+        val callbackConvert = plugin.getCallbackConvertImg()
+        client?.respone(msg.toJSONString(),type,callbackConvert,packId)
     }
 
     /**

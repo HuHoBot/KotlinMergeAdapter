@@ -143,6 +143,10 @@ class HuHoBotSpigot: JavaPlugin(),HuHoBot {
         return configManager.getServerId()
     }
 
+    override fun getCallbackConvertImg(): Int {
+        return config.getInt("callbackConvertImg",0)
+    }
+
     override fun loadCustomCommand() {
         configManager.loadCommandsFromConfig()
     }
