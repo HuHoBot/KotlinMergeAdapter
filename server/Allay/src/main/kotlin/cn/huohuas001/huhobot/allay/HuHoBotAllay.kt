@@ -23,7 +23,6 @@ import org.allaymc.api.plugin.Plugin
 import org.allaymc.api.registry.Registries
 import org.allaymc.api.server.Server
 import java.nio.file.Path
-import kotlin.collections.iterator
 
 class HuHoBotAllay: Plugin(), HuHoBot {
     override var bindRequestObj = BindRequest()
@@ -68,6 +67,7 @@ class HuHoBotAllay: Plugin(), HuHoBot {
     }
 
     override fun onEnable() {
+        Server.getInstance().eventBus.registerListener(this)
         enableBot()
     }
 

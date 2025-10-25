@@ -1,7 +1,6 @@
 package cn.huohuas001.huhobot.nkmot.events
 
 import cn.huohuas001.bot.ClientManager
-import cn.huohuas001.huhobot.nkmot.HuHoBotNkMot
 import cn.nukkit.event.EventHandler
 import cn.nukkit.event.Listener
 import cn.nukkit.event.player.PlayerChatEvent
