@@ -29,7 +29,8 @@ class ConfigManager(private val mod: HuHoBotMod) {
 
     init {
         // 配置目录：服务器根目录/config/huhobot
-        configDir = File("./config/huhobot")
+
+        configDir = File(ExpectPlatform.getConfigDirectory().toString()+"/huhobot")
 
         if (!configDir.exists() && !configDir.mkdirs()) {
             logger.error("创建配置目录失败！路径：${configDir.absolutePath}")
@@ -40,9 +41,6 @@ class ConfigManager(private val mod: HuHoBotMod) {
 
         // 加载默认配置
         loadDefaultConfig()
-
-        // 检查并转换配置版本
-        checkAndConvertConfig()
 
         // 读取配置到内存
         reloadConfig()
