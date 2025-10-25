@@ -34,7 +34,8 @@ object HuHoBotMod: HuHoBot {
     override var eventList:MutableMap<String, BaseEvent> = HashMap<String, BaseEvent>()
 
     fun onChatEvent(player:ServerPlayer , component:Component): EventResult{
-        ClientManager.postChat(player.name.string,component.string)
+        val componentString = component.string
+        ClientManager.postChat(player.name.string,componentString)
         return EventResult.pass()
     }
 

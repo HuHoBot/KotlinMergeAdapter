@@ -15,7 +15,7 @@ class QueryOnline(val plugin: HuHoBotMod) : BaseEvent() {
         val onlineSize = onlinePlayers.size
         if (outputOnlineList && !onlinePlayers.isEmpty()) {
             onlinePlayers.forEach {
-                player -> onlineNameString.append(player!!.name).append("\n")
+                player -> onlineNameString.append(player!!.name.string).append("\n")
             }
         } else if (outputOnlineList) {
             onlineNameString.append("\n当前没有在线玩家\n")
