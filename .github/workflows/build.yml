@@ -153,5 +153,62 @@ jobs:
             - 提交哈希: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
           files: |
             artifacts/HuHoBot-*.jar
-            
-      
+
+  releaseMinebbs:
+    name: Create Minebbs Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        platform: [ "Spigot","AllayMC","Fabric","Nukkit-MOT" ]
+        resource: [ 11413, 10916, 13656, 11363 ]
+
+    steps:
+
+      - name: Extract release info
+        id: changelog
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+
+          # 修复：使用正确的标签格式匹配
+          VERSION=${TAG_NAME#v}  # 去除v前缀（如果CHANGELOG使用纯版本号）
+
+          CHANGELOG_CONTENT=$(awk -v version="[v$VERSION]" '
+            BEGIN {RS="## "; FS="\n"}
+            $1 ~ version {
+              sub(/\[.*\] - .*\n/, "")
+              gsub(/`/, "\\`")
+              gsub(/"/, "\\\"")
+              print
+              exit
+            }
+          ' CHANGELOG.md)
+
+          EOF_MARKER=$(openssl rand -base64 12)
+          echo "body<<$EOF_MARKER" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+          echo "$EOF_MARKER" >> $GITHUB_OUTPUT
+
+          # 添加标签名输出
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Get timestamp
+        id: get-time
+        run: echo "TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+      - name: Minebbs-Auto-Release for ${{ matrix.platform }}
+        uses: HuoHuas001/Minebbs-Auto-Release@v1.0.7
+        with:
+          resources: ${{ matrix.resource }}
+          token: ${{ secrets.MINEBBSKEY }}
+          title: HuHoBot-BDS-Adapter ${{ github.ref_name }}
+          new_version: ${{ github.ref_name }}
+          description: |        
+            ${{ steps.changelog.outputs.body }}
+
+            ### 构建信息
+            - 构建时间: ${{ steps.get-time.outputs.TIME }}
+            - 提交哈希: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+          file_url: 'https://release.huhobot.txssb.cn/kotlin/HuHoBot-${{ github.ref_name }}-${{ matrix.platform }}.jar'
