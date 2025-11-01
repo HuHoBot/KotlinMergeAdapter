@@ -2,7 +2,7 @@
 name: HuHoBot
 main: cn.huohuas001.huhobot.nkmot.HuHoBotNkMot
 #remember version and api is string, don't write it like this: 1.0.0, or there will be an exception
-version: "1.0.7"
+version: "${version}"
 api: ["1.0.5"]
 load: POSTWORLD
 author: "HuoHuas001"

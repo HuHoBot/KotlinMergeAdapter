@@ -29,4 +29,10 @@ customCommand:
     command: "whitelist add &1"
     permission: 1
 
-version: 4
+CommandExecutionSort:
+  - "NATIVE"
+  - "DEDICATED_SERVER"
+  - "MINECRAFT_SERVER"
+  - "SIMULATE_CONSOLE"
+
+version: 5

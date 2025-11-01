@@ -8,10 +8,11 @@ java {
     }
 }
 
+
 dependencies {
-    implementation("io.ktor:ktor-client-websockets:2.3.10")
-    implementation("io.ktor:ktor-client-java:2.3.10")
-    implementation("io.ktor:ktor-client-core:2.3.10") {
+    implementation("io.ktor:ktor-client-websockets:1.6.8")
+    implementation("io.ktor:ktor-client-cio:1.6.8")
+    implementation("io.ktor:ktor-client-core:1.6.8") {
         exclude(group = "org.slf4j")
         exclude(group = "org.yaml")
     }

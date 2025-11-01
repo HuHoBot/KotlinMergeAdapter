@@ -40,9 +40,9 @@ dependencies {
     shadowCommon(project(":server-Architectury:common", "transformProductionFabric")){ isTransitive = false }
     shadowCommon("org.yaml:snakeyaml:2.5")
 
-    shadowCommon("io.ktor:ktor-client-websockets:2.3.10")
-    shadowCommon("io.ktor:ktor-client-java:2.3.10")
-    shadowCommon("io.ktor:ktor-client-core:2.3.10") {
+    shadowCommon("io.ktor:ktor-client-websockets:1.6.8")
+    shadowCommon("io.ktor:ktor-client-cio:1.6.8")
+    shadowCommon("io.ktor:ktor-client-core:1.6.8") {
         exclude(group = "org.slf4j")
     }
 

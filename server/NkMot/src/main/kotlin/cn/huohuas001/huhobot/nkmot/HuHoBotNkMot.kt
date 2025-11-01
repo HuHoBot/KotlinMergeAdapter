@@ -9,6 +9,7 @@ import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.provider.ChatFormat
 import cn.huohuas001.bot.provider.CustomCommandDetail
 import cn.huohuas001.bot.provider.Motd
+import cn.huohuas001.bot.providers.HExecution
 import cn.huohuas001.bot.tools.Cancelable
 import cn.huohuas001.bot.tools.getPackID
 import cn.huohuas001.huhobot.nkmot.commands.HuHoBotCommand
@@ -18,6 +19,7 @@ import cn.huohuas001.huhobot.nkmot.managers.ConfigManager
 import cn.huohuas001.huhobot.nkmot.tools.ConsoleSender
 import cn.nukkit.plugin.PluginBase
 import cn.nukkit.plugin.PluginLogger
+import java.util.concurrent.CompletableFuture
 
 class HuHoBotNkMot: PluginBase(), HuHoBot {
     override var bindRequestObj = BindRequest()
@@ -144,10 +146,19 @@ class HuHoBotNkMot: PluginBase(), HuHoBot {
         BotShared.customCommandMap = commandMap
     }
 
-    override fun sendCommand(command: String): String {
-        val sender = ConsoleSender(server.consoleSender)
-        server.dispatchCommand(sender, command)
-        return sender.output.toString()
+    override fun sendCommand(command: String): CompletableFuture<HExecution> {
+        class NkExecution: HExecution {
+            val sender = ConsoleSender(server.consoleSender)
+            override fun getRawString(): String {
+                return sender.output.toString()
+            }
+
+            override fun execute(command: String): CompletableFuture<HExecution> {
+                server.dispatchCommand(sender, command)
+                return CompletableFuture.completedFuture(this)
+            }
+        }
+        return NkExecution().execute(command)
     }
 
     override fun submit(task: Runnable): Cancelable {

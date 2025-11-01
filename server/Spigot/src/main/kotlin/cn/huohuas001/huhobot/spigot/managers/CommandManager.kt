@@ -15,7 +15,7 @@ class CommandManager(val plugin: HuHoBotSpigot) : CommandExecutor {
             sender.sendMessage("${ChatColor.DARK_RED}你没有足够的权限.")
             return
         }
-        if (plugin.configManager.saveConfig()) {
+        if (plugin.configManager.reloadConfig()) {
             sender.sendMessage("${ChatColor.AQUA}重载机器人配置文件成功.")
         }
     }

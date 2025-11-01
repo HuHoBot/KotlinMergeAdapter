@@ -5,9 +5,15 @@ import cn.huohuas001.bot.tools.getPackID
 import com.alibaba.fastjson2.JSON
 import com.alibaba.fastjson2.JSONObject
 import io.ktor.client.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.websocket.*
+import io.ktor.client.features.websocket.*
+import io.ktor.http.*
+import io.ktor.http.cio.websocket.CloseReason
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.WebSocketSession
+import io.ktor.http.cio.websocket.close
+import io.ktor.http.cio.websocket.readText
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.*
 import java.net.URI
 import java.util.concurrent.CompletableFuture
 import kotlin.coroutines.CoroutineContext
@@ -17,7 +23,7 @@ class WsClient(private val plugin: HuHoBot, val serverUri: URI) : CoroutineScope
     private val client: HttpClient = HttpClient {
         install(WebSockets)
     }
-    private var webSocketSession: DefaultClientWebSocketSession? = null
+    private var webSocketSession: WebSocketSession? = null
     private val job = Job()
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO + job
@@ -39,7 +45,7 @@ class WsClient(private val plugin: HuHoBot, val serverUri: URI) : CoroutineScope
 
                     // 处理接收消息
                     try {
-                        for (frame in incoming) {
+                        incoming.consumeEach { frame ->
                             when (frame) {
                                 is Frame.Text -> {
                                     val message = frame.readText()
@@ -192,9 +198,9 @@ class WsClient(private val plugin: HuHoBot, val serverUri: URI) : CoroutineScope
      * @param msg  回报消息
      * @param type 回报类型：success|error
      */
-    fun respone(msg: String, type: String,callbackConvert: Int) {
+    fun respone(msg: String, type: String, callbackConvert: Int) {
         val newPackId = getPackID()
-        respone(msg, type,callbackConvert, newPackId)
+        respone(msg, type, callbackConvert, newPackId)
     }
 
     /**
@@ -204,7 +210,7 @@ class WsClient(private val plugin: HuHoBot, val serverUri: URI) : CoroutineScope
      * @param type   回报类型：success|error
      * @param packId 回报Id
      */
-    fun respone(msg: String, type: String,callbackConvert: Int, packId: String) {
+    fun respone(msg: String, type: String, callbackConvert: Int, packId: String) {
         val body = JSONObject()
         body["msg"] = msg
         body["callbackConvert"] = callbackConvert
@@ -227,9 +233,9 @@ class WsClient(private val plugin: HuHoBot, val serverUri: URI) : CoroutineScope
     /**
      * 关闭连接
      */
-    fun close(code: Int = 1000, reason: String = "") {
+    fun close(code: Short = 1000, reason: String = "") {
         launch {
-            webSocketSession?.close(CloseReason(code.toShort(), reason))
+            webSocketSession?.close(CloseReason(code, reason))
             client.close()
             job.cancel()
         }

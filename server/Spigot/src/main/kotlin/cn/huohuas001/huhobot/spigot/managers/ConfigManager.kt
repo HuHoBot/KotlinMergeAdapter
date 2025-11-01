@@ -16,7 +16,7 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
 
     private val configFile: File = File(plugin.dataFolder, "config.yml")
     private val oldConfigFile: File = File(plugin.dataFolder, "config_old.yml")
-    private val version: Int = 4
+    private val version: Int = 5
 
     init {
         if (checkConfig()) {
@@ -33,15 +33,20 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
         return true
     }
 
-    // 添加从版本3到版本4的迁移方法
-    private fun migrateFromV3ToV4(oldConfig: FileConfiguration, newConfig: FileConfiguration) {
-        // 添加新的 callbackConvertImg 配置项，默认值为0
-        if (!newConfig.contains("callbackConvertImg")) {
-            newConfig.set("callbackConvertImg", 0)
-            plugin.pluginLogger.info("已添加新的配置项: callbackConvertImg = 0")
+    // 添加从版本4到版本5的迁移方法
+    private fun migrateFromV4ToV5(oldConfig: FileConfiguration, newConfig: FileConfiguration) {
+        // 添加新的 CommandExecutionSort 配置项，默认值为标准执行顺序
+        if (!newConfig.contains("CommandExecutionSort")) {
+            newConfig.set("CommandExecutionSort", listOf(
+                "NATIVE",
+                "DEDICATED_SERVER",
+                "MINECRAFT_SERVER",
+                "SIMULATE_CONSOLE"
+            ))
+            plugin.pluginLogger.info("已添加新的配置项: CommandExecutionSort")
         }
 
-        // 可以在这里添加其他从版本3到版本4的迁移逻辑
+        // 可以在这里添加其他从版本4到版本5的迁移逻辑
     }
 
     fun migrateConfig() {
@@ -65,13 +70,14 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
 
                 // 根据旧版本号执行相应的迁移
                 when (oldVersion) {
-                    3 -> {
+                    (version-1) -> {
                         // 从版本3迁移到版本4
-                        migrateFromV3ToV4(oldConfig, newConfig)
-                        plugin.pluginLogger.info("配置文件从版本3升级到版本4完成")
+                        migrateFromV4ToV5(oldConfig, newConfig)
+                        var oldVersion = version-1
+                        plugin.pluginLogger.info("配置文件从版本$oldVersion 升级到$version")
                     }
                     // 如果还有其他旧版本，可以继续添加
-                    in 0..2 -> {
+                    in 0..3 -> {
                         // 对于更旧的版本，可以复用之前的迁移逻辑或直接使用默认配置
                         plugin.pluginLogger.warning("检测到较旧的配置版本($oldVersion)，将使用默认配置")
                     }
@@ -111,8 +117,13 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
 
     fun saveConfig(): Boolean {
         plugin.saveConfig()
+        return reloadConfig()
+    }
+
+    fun reloadConfig(): Boolean{
         plugin.reloadConfig()
         loadCommandsFromConfig()
+        plugin.setSender()
         return true
     }
 

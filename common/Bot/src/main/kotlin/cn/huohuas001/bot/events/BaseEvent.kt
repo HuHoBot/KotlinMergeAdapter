@@ -27,8 +27,16 @@ open class BaseEvent {
     fun sendCommand(command: String){
         val plugin = BotShared.getPlugin()
         plugin.submit{
-            val ret:String = plugin.sendCommand(command)
-            ClientManager.postRespone("已执行.\n$ret", "success", mPackId);
+            val ret = plugin.sendCommand(command)
+            ret.thenAccept {
+                val retText = it.getRawString()
+                if (retText.isNotEmpty()) {
+                    ClientManager.postRespone("已执行.\n$retText", "success", mPackId);
+                }else{
+                    ClientManager.postRespone("已执行.\n无返回结果", "success", mPackId);
+                }
+            }
+
         }
     }
 

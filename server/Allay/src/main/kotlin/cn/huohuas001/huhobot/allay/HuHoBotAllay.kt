@@ -8,6 +8,7 @@ import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.provider.ChatFormat
 import cn.huohuas001.bot.provider.CustomCommandDetail
 import cn.huohuas001.bot.provider.Motd
+import cn.huohuas001.bot.providers.HExecution
 import cn.huohuas001.bot.tools.Cancelable
 import cn.huohuas001.huhobot.allay.commands.HuHoBotCommand
 import cn.huohuas001.huhobot.allay.events.QueryAllowList
@@ -23,6 +24,7 @@ import org.allaymc.api.plugin.Plugin
 import org.allaymc.api.registry.Registries
 import org.allaymc.api.server.Server
 import java.nio.file.Path
+import java.util.concurrent.CompletableFuture
 
 class HuHoBotAllay: Plugin(), HuHoBot {
     override var bindRequestObj = BindRequest()
@@ -171,11 +173,22 @@ class HuHoBotAllay: Plugin(), HuHoBot {
         BotShared.customCommandMap = commandMap
     }
 
-    override fun sendCommand(command: String): String {
+    override fun sendCommand(command: String): CompletableFuture<HExecution> {
         val sender = HuHoBotCommandSender(this)
-        Registries.COMMANDS.execute(sender, command)
-        val message = sender.outputs.toString()
-        return message
+
+
+        class AllayExecution: HExecution {
+            override fun getRawString(): String {
+                return sender.outputs.toString()
+            }
+
+            override fun execute(command: String): CompletableFuture<HExecution> {
+                Registries.COMMANDS.execute(sender, command)
+                return CompletableFuture.completedFuture(this)
+            }
+        }
+
+        return AllayExecution().execute(command)
     }
 
     override fun submit(task: Runnable): Cancelable {

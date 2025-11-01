@@ -6,6 +6,7 @@ import cn.huohuas001.bot.events.BaseEvent
 import cn.huohuas001.bot.events.BindRequest
 import cn.huohuas001.bot.provider.ChatFormat
 import cn.huohuas001.bot.provider.Motd
+import cn.huohuas001.bot.providers.HExecution
 import cn.huohuas001.bot.tools.Cancelable
 import cn.huohuas001.huhobot.mod.events.QueryAllowList
 import cn.huohuas001.huhobot.mod.events.QueryOnline
@@ -20,6 +21,7 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import java.util.concurrent.CompletableFuture
 
 object HuHoBotMod: HuHoBot {
     const val MOD_ID: String = "huhobot"
@@ -147,15 +149,18 @@ object HuHoBotMod: HuHoBot {
         config.loadCommandsFromConfig()
     }
 
-    override fun sendCommand(command: String): String {
-        var msg = "";
-        commandManager.executeCommand(
-                command
-        ) { result: CommandManager.CommandResult? ->
-            val sendCmdMsg: String = result?.output ?: ""
-            msg = sendCmdMsg
+    override fun sendCommand(command: String): CompletableFuture<HExecution> {
+        class ModExecution: HExecution {
+            override fun getRawString(): String {
+                return "Command Execute."
+            }
+
+            override fun execute(command: String): CompletableFuture<HExecution> {
+                commandManager.executeCommand(command) {}
+                return CompletableFuture.completedFuture(this)
+            }
         }
-        return msg
+        return ModExecution().execute(command)
     }
 
     override fun submit(task: Runnable): Cancelable {

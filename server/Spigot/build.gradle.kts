@@ -32,11 +32,10 @@ dependencies {
     shadowCommon("com.alibaba.fastjson2:fastjson2:2.0.52")
     shadowCommon("com.github.Anon8281:UniversalScheduler:0.1.6")
 
-    shadowCommon("io.ktor:ktor-client-websockets:2.3.10")
-    shadowCommon("io.ktor:ktor-client-java:2.3.10")
-    shadowCommon("io.ktor:ktor-client-core:2.3.10") {
-        exclude(group = "org.slf4j")
-    }
+    shadowCommon("io.ktor:ktor-client-websockets:1.6.8")
+    shadowCommon("io.ktor:ktor-client-cio:1.6.8")
+    shadowCommon("io.ktor:ktor-client-core:1.6.8")
+    shadowCommon("org.slf4j:slf4j-simple:1.7.36")
     shadowCommon("com.alibaba.fastjson2:fastjson2:2.0.52") {
         exclude(group = "org.jetbrains")
     }
@@ -65,8 +64,6 @@ tasks.shadowJar {
     exclude("**/*.txt")
     exclude("META-INF/maven/**")
     exclude("META-INF/LICENSE**")
-    exclude("org/slf4j/**")
-    exclude("org/yaml/**")
     exclude("org/jetbrains/**")
     exclude("META-INF/versions/**")
     exclude("META-INF/proguard/**")
