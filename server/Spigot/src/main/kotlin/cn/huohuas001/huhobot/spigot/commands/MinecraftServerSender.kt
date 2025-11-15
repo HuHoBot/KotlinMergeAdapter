@@ -36,19 +36,36 @@ class MinecraftServerSender(private val plugin: HuHoBotSpigot): HExecution {
     }
 
     override fun execute(command: String): CompletableFuture<HExecution> {
-        val checked = check()
-        CompletableFuture.runAsync {
-            message = try {
-                if (method.name == "runCommand") {
+        // 先检查是否已初始化
+        if (!::minecraftServer.isInitialized || !::method.isInitialized) {
+            val checked = check()
+            if (!checked) {
+                val future = CompletableFuture<HExecution>()
+                future.completeExceptionally(RuntimeException("MinecraftServer sender not properly initialized"))
+                return future
+            }
+        }
+
+        // 创建 CompletableFuture 用于返回结果
+        val future = CompletableFuture<HExecution>()
+
+        // 使用 Bukkit 调度器在主线程中执行命令
+        plugin.submit {
+            try {
+                val result = if (method.name == "runCommand") {
                     method.invoke(minecraftServer, rconConsoleSource, command) as String
                 } else {
                     method.invoke(minecraftServer, command) as String
                 }
+                message = result
             } catch (e: Exception) {
-                "命令执行失败: ${e.message}"
+                message = "命令执行失败: ${e.message}"
             }
+            // 执行完成后完成 future
+            future.complete(this)
         }
-        return CompletableFuture.completedFuture(this)
+
+        return future
     }
 
     @Throws(ClassNotFoundException::class)

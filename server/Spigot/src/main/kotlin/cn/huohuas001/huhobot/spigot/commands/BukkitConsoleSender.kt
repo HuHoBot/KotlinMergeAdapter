@@ -17,46 +17,6 @@ import org.bukkit.plugin.Plugin
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-open class Spigot {
-    /**
-     * Sends this sender a chat component.
-     *
-     * @param component the components to send
-     */
-    open fun sendMessage(component: BaseComponent) {
-        throw java.lang.UnsupportedOperationException("Not supported yet.")
-    }
-
-    /**
-     * Sends an array of components as a single message to the sender.
-     *
-     * @param components the components to send
-     */
-    open fun sendMessage(vararg components: BaseComponent) {
-        throw java.lang.UnsupportedOperationException("Not supported yet.")
-    }
-
-    /**
-     * Sends this sender a chat component.
-     *
-     * @param component the components to send
-     * @param sender the sender of the message
-     */
-    fun sendMessage(sender: UUID?, component: BaseComponent) {
-        throw java.lang.UnsupportedOperationException("Not supported yet.")
-    }
-
-    /**
-     * Sends an array of components as a single message to the sender.
-     *
-     * @param components the components to send
-     * @param sender the sender of the message
-     */
-    fun sendMessage(sender: UUID?, vararg components: BaseComponent) {
-        throw java.lang.UnsupportedOperationException("Not supported yet.")
-    }
-}
-
 class BukkitConsoleSender(val plugin: HuHoBotSpigot) : ConsoleCommandSender, HExecution {
     private val messageList = mutableListOf<String>()
 
@@ -179,10 +139,25 @@ class BukkitConsoleSender(val plugin: HuHoBotSpigot) : ConsoleCommandSender, HEx
     }
 
     override fun execute(command: String): CompletableFuture<HExecution> {
-        Bukkit.dispatchCommand(this, command)
-        return CompletableFuture.supplyAsync {
-            Thread.sleep(2 * 1000L)
-            this
+        val future = CompletableFuture<HExecution>()
+
+        // 在主线程中执行命令
+        plugin.submit{
+            try {
+                Bukkit.dispatchCommand(this, command)
+
+                // 异步等待2秒后完成future
+                CompletableFuture.supplyAsync {
+                    Thread.sleep(2 * 1000L)
+                    this
+                }.thenAccept { result ->
+                    future.complete(result)
+                }
+            } catch (e: Exception) {
+                future.completeExceptionally(e)
+            }
         }
+
+        return future
     }
 }

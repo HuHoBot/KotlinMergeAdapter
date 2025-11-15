@@ -26,8 +26,22 @@ class DecidatedServerSender(private val plugin: HuHoBotSpigot): HExecution {
     }
 
     override fun execute(command: String): CompletableFuture<HExecution> {
-        message = method.invoke(dedicatedServer, command) as String
-        return CompletableFuture.completedFuture(this)
+        // 先检查是否已初始化
+        if (!::dedicatedServer.isInitialized || !::method.isInitialized) {
+            val checked = check()
+            if (!checked) {
+                val future = CompletableFuture<HExecution>()
+                future.completeExceptionally(RuntimeException("DedicatedServer sender not properly initialized"))
+                return future
+            }
+        }
+
+        val future = CompletableFuture<HExecution>()
+        plugin.submit {
+            message = method.invoke(dedicatedServer, command) as String
+            future.complete(this)
+        }
+        return future
     }
 
     override fun getRawString(): String {

@@ -28,11 +28,36 @@ class NativeServerSender(private val plugin: HuHoBotSpigot) : HExecution {
     }
 
     override fun execute(command: String): CompletableFuture<HExecution> {
-        Bukkit.dispatchCommand(commandSender, command)
-        return CompletableFuture.supplyAsync {
-            Thread.sleep(2 * 1000L)
-            this
+        // 先检查是否已初始化
+        if (!::commandSender.isInitialized) {
+            val checked = check()
+            if (!checked) {
+                val future = CompletableFuture<HExecution>()
+                future.completeExceptionally(RuntimeException("NativeServerSender sender not properly initialized"))
+                return future
+            }
         }
+
+        val future = CompletableFuture<HExecution>()
+
+        // 在主线程中执行命令
+        plugin.submit{
+            try {
+                Bukkit.dispatchCommand(commandSender, command)
+
+                // 异步等待2秒后完成future
+                CompletableFuture.supplyAsync {
+                    Thread.sleep(2 * 1000L)
+                    this
+                }.thenAccept { result ->
+                    future.complete(result)
+                }
+            } catch (e: Exception) {
+                future.completeExceptionally(e)
+            }
+        }
+
+        return future
     }
 
 
