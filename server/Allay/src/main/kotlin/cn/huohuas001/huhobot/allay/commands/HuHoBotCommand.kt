@@ -6,7 +6,11 @@ import org.allaymc.api.command.Command
 import org.allaymc.api.command.tree.CommandTree
 import org.allaymc.api.utils.TextFormat
 
-class HuHoBotCommand(private val plugin: HuHoBotAllay) : Command("huhobot", "HuHoBot's control command","huhobot.command") {
+class HuHoBotCommand(private val plugin: HuHoBotAllay) : Command(
+    "huhobot",
+    "HuHoBot's control command",
+    "huhobot.command"
+) {
 
     override fun prepareCommandTree(tree: CommandTree) {
         tree.root
