@@ -1,5 +1,5 @@
 plugins {
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
 }
 
 repositories {
@@ -93,9 +93,12 @@ tasks.sourcesJar {
     from(commonSources.archiveFile.map { zipTree(it) })
 }
 
-components.getByName("java") {
+/*components.getByName("java") {
     this as AdhocComponentWithVariants
-    this.withVariantsFromConfiguration(project.configurations["shadowRuntimeElements"]) {
-        skip()
+    // 安全检查配置是否存在
+    project.configurations.findByName("shadowRuntimeElements")?.let { config ->
+        this.withVariantsFromConfiguration(config) {
+            skip()
+        }
     }
-}
+}*/

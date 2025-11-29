@@ -7,8 +7,9 @@ import org.allaymc.api.math.location.Location3dc
 import org.allaymc.api.message.I18n
 import org.allaymc.api.message.LangCode
 import org.allaymc.api.message.TrContainer
-import org.allaymc.api.permission.PermissionGroup
-import org.allaymc.api.permission.PermissionGroups
+import org.allaymc.api.permission.ConstantPermissionCalculator
+import org.allaymc.api.permission.PermissionCalculator
+import org.allaymc.api.permission.Tristate
 import org.allaymc.api.server.Server
 
 class HuHoBotCommandSender(val plugin: HuHoBotAllay) : CommandSender {
@@ -33,13 +34,22 @@ class HuHoBotCommandSender(val plugin: HuHoBotAllay) : CommandSender {
         sendMessage(I18n.get().tr(LangCode.zh_CN, translatable, *args))
     }
 
-    override fun sendCommandOutputs(sender: CommandSender, status: Int, vararg outputs: TrContainer) {
+    override fun sendCommandOutputs(
+        sender: CommandSender,
+        status: Int,
+        permissions: List<String>,
+        vararg outputs: TrContainer
+    ) {
         for (output in outputs) {
             sendMessage(I18n.get().tr(LangCode.zh_CN, output.str(), *output.args()))
         }
     }
 
-    override fun getPermissionGroup(): PermissionGroup {
-        return PermissionGroups.OPERATOR
+    override fun getPermissionCalculator(): PermissionCalculator {
+        return ConstantPermissionCalculator(Tristate.TRUE);
+    }
+
+    override fun setPermissionCalculator(calculator: PermissionCalculator) {
+
     }
 }

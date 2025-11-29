@@ -4,6 +4,7 @@ import cn.huohuas001.bot.ClientManager
 import cn.huohuas001.bot.events.BaseEvent
 import cn.huohuas001.huhobot.allay.HuHoBotAllay
 import org.allaymc.api.entity.interfaces.EntityPlayer
+import org.allaymc.api.player.Player
 import org.allaymc.api.server.Server
 import java.util.function.Consumer
 
@@ -17,9 +18,9 @@ class QueryOnline(val plugin: HuHoBotAllay) : BaseEvent() {
 
         val onlineSize = onlinePlayers.size
         if (outputOnlineList && !onlinePlayers.isEmpty()) {
-            onlinePlayers.values.forEach(Consumer { player: EntityPlayer? ->
-                onlineNameString.append(player!!.nameTag).append("\n")
-            })
+            onlinePlayers.values.forEach{ player: Player ->
+                onlineNameString.append("${player.originName}\n")
+            }
         } else if (outputOnlineList) {
             onlineNameString.append("\n当前没有在线玩家\n")
         }

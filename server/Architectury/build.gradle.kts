@@ -2,10 +2,10 @@ import net.fabricmc.loom.api.LoomGradleExtensionAPI
 
 plugins {
     java
-    kotlin("jvm") version "2.2.0"
+    kotlin("jvm")
     id("architectury-plugin") version "3.4-SNAPSHOT"
     id("dev.architectury.loom") version "1.10-SNAPSHOT" apply false
-    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+    id("com.gradleup.shadow")
 }
 
 architectury {

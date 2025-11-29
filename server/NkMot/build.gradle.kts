@@ -1,7 +1,7 @@
 plugins {
     java
-    kotlin("jvm") version "2.2.0"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    kotlin("jvm")
+    id("com.gradleup.shadow")
 }
 
 group = "cn.huohuas001"

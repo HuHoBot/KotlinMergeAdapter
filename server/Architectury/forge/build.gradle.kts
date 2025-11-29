@@ -1,5 +1,5 @@
 plugins {
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
 }
 
 architectury {
@@ -98,9 +98,9 @@ tasks.sourcesJar {
     from(commonSources.archiveFile.map { zipTree(it) })
 }
 
-components.getByName("java") {
+/*components.getByName("java") {
     this as AdhocComponentWithVariants
     this.withVariantsFromConfiguration(project.configurations["shadowRuntimeElements"]) {
         skip()
     }
-}
+}*/

@@ -1,3 +1,3 @@
-# HuHoBot-Adapter v2.0.4
+# HuHoBot-Adapter v2.0.5
 
-- **Spigot**-feat(command): 修复部分服务端命令无法执行的问题
+- **Allay**-feat(api): 适配Allay-API:0.17.0+

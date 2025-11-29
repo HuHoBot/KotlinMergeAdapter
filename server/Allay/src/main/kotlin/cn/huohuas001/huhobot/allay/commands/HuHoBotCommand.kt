@@ -4,13 +4,9 @@ package cn.huohuas001.huhobot.allay.commands
 import cn.huohuas001.huhobot.allay.HuHoBotAllay
 import org.allaymc.api.command.Command
 import org.allaymc.api.command.tree.CommandTree
-import org.allaymc.api.permission.PermissionGroups
 import org.allaymc.api.utils.TextFormat
 
-class HuHoBotCommand(private val plugin: HuHoBotAllay) : Command("huhobot", "HuHoBot's control command") {
-    init {
-        permissions.forEach { PermissionGroups.OPERATOR.addPermission(it) }
-    }
+class HuHoBotCommand(private val plugin: HuHoBotAllay) : Command("huhobot", "HuHoBot's control command","huhobot.command") {
 
     override fun prepareCommandTree(tree: CommandTree) {
         tree.root

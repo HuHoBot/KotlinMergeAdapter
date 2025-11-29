@@ -1,14 +1,19 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import kotlin.text.set
-
 plugins {
-    kotlin("jvm") version "2.2.0"
     java
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    kotlin("jvm")
+    id("org.allaymc.gradle.plugin") version "0.1.2"
+    id("com.gradleup.shadow")
 }
 
-group = "cn.huohuas001.huhobot"
+group = "cn.huohua001.huhobot"
 description = "HuHoBot Allay Adapter"
+
+val shadowCommon: Configuration by configurations.creating
+
+tasks.shadowJar {
+    //configurations = listOf(shadowCommon)
+    archiveFileName.set("HuHoBot-${project.version}-Allay.jar")
+}
 
 java {
     toolchain {
@@ -16,13 +21,46 @@ java {
     }
 }
 
+allay {
+    // API 版本（如果 `apiOnly = true` 则必需）。
+    api = "0.17.0"
+
+    // 将此字段设置为 `false` 以访问服务器模块并使用内部 API。但是不推荐这样做，
+    // 因为内部 API 可能随时更改。
+    // 默认值为 `true`。
+    apiOnly = true
+
+    // 指定在 `runServer` 任务中使用的服务器版本。如果 `apiOnly` 设置为 `false`，
+    // 这也将作为依赖版本。如果此字段设置为 `null`，将使用最新的服务器版本。
+    // 默认值为 `null`。
+    server = null
+
+    // 配置插件描述符（plugin.json）。
+    plugin {
+        entrance = ".allay.HuHoBotAllay"
+
+        apiVersion = ">=0.17.0"
+
+        name = "HuHoBot"
+
+        authors += "HuoHuas001"
+        website = "https://github.com/HuHoBot/KotlinMergeAdapter"
+    }
+
+
+}
+
+tasks.withType<AbstractCopyTask>().configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+
 repositories {
     mavenCentral()
     maven("https://storehouse.okaeri.eu/repository/maven-public/")
 }
 
 dependencies {
-    compileOnly(group = "org.allaymc.allay", name = "api", version = "0.14.0")
     compileOnly(group = "org.projectlombok", name = "lombok", version = "1.18.34")
 
     implementation(project(":common-Bot"))
@@ -45,22 +83,3 @@ dependencies {
 }
 
 
-tasks.shadowJar {
-    archiveFileName.set("HuHoBot-${project.version}-AllayMC.jar")
-
-    // 去除重复文件（只需在这里配置一次）
-    mergeServiceFiles()
-
-    // 其他优化选项
-    exclude("**/*.md")
-    exclude("**/*.txt")
-    exclude("META-INF/maven/**")
-    exclude("META-INF/LICENSE**")
-    exclude("org/slf4j/**")
-    exclude("org/yaml/**")
-    exclude("org/jetbrains/**")
-    exclude("META-INF/versions/**")
-    exclude("META-INF/proguard/**")
-    exclude("META-INF/native-image/**")
-    exclude("META-INF/scm/**")
-}
