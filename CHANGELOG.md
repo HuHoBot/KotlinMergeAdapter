@@ -1,3 +1,3 @@
-# HuHoBot-Adapter v2.0.5
+# HuHoBot-Adapter v2.0.6
 
-- **Allay**-feat(api): 适配Allay-API:0.17.0+
+- **NeoForge**: 适配NeoForge

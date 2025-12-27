@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/server/Architectury/common" />
             <option value="$PROJECT_DIR$/server/Architectury/fabric" />
             <option value="$PROJECT_DIR$/server/Architectury/forge" />
+            <option value="$PROJECT_DIR$/server/Architectury/neoforge" />
             <option value="$PROJECT_DIR$/server/NkMot" />
             <option value="$PROJECT_DIR$/server/Spigot" />
           </set>

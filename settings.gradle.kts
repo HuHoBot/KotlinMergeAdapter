@@ -42,5 +42,6 @@ project(":server-Architectury").projectDir = file("server/Architectury")
 include(":server-Architectury:common")
 include(":server-Architectury:fabric")
 include(":server-Architectury:forge")
+include(":server-Architectury:neoforge")
 
 rootProject.name = "HuHoBot"

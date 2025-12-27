@@ -13,11 +13,16 @@ allprojects {
 
     tasks.register("buildAndGather") {
         group = "build"
-        description = "Build fabric and forge projects with standard build, others with shadowJar"
+        description = "Build fabric, forge and neoforge projects with standard build, others with shadowJar"
+
+        // 递归获取所有子项目
+        fun getAllProjects(project: Project): List<Project> {
+            return listOf(project) + project.subprojects.flatMap(::getAllProjects)
+        }
 
         // 在配置阶段设置依赖关系，而不是在 doFirst 中
-        subprojects.forEach { project ->
-            if (project.name == "fabric" || project.name == "forge") {
+        getAllProjects(this.project).drop(1).forEach { project -> // drop(1) 排除根项目
+            if (project.name == "fabric" || project.name == "forge" || project.name == "neoforge") {
                 // 使用标准 build 任务
                 dependsOn(project.tasks.named("build"))
             } else {
@@ -34,9 +39,10 @@ allprojects {
             val gatherDir = layout.buildDirectory.dir("gathered-jars").get().asFile
             gatherDir.mkdirs()
 
-            subprojects.forEach { project ->
+            // 递归处理所有子项目
+            getAllProjects(this.project).drop(1).forEach { project -> // drop(1) 排除根项目
                 try {
-                    val jarFile = if (project.name == "fabric" || project.name == "forge") {
+                    val jarFile = if (project.name == "fabric" || project.name == "forge" || project.name == "neoforge") {
                         // 获取标准 build 产生的 jar 文件
                         project.tasks.named("remapJar").get().outputs.files.singleFile
                     } else {
