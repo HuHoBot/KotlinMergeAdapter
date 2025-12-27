@@ -8,7 +8,7 @@ pipeline {
         R2_ACCESS_KEY = credentials('r2-access-key-id')
         R2_SECRET_KEY = credentials('r2-secret-access-key')
         R2_BUCKET = credentials('r2-bucket')
-        GITHUB_TOKEN = credentials('github-token')
+        GITHUB_TOKEN = credentials('github-pat')
     }
 
     stages {
