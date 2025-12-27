@@ -54,7 +54,7 @@ pipeline {
                     sed -i '/^distributionUrl=/d' $WRAPPER_FILE
 
                     # 写入新的阿里云 URL
-                    echo "distributionUrl=https\\://mirrors.aliyun.com/gradle/distributions/gradle-9.1.0-bin.zip" >> $WRAPPER_FILE
+                    echo "distributionUrl=https\\://mirrors.aliyun.com/gradle/distributions/v9.1.0/gradle-9.1.0-bin.zip" >> $WRAPPER_FILE
 
                     # 检查是否生效
                     grep distributionUrl $WRAPPER_FILE
