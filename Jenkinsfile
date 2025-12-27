@@ -41,20 +41,21 @@ pipeline {
         }
 
         stage('Patch Gradle Wrapper (Aliyun Mirror)') {
-    when {
-        expression { env.IS_TAG == "true" }
-    }
-    steps {
-        sh """
-            set -e
-            WRAPPER_FILE=gradle/wrapper/gradle-wrapper.properties
-            echo "Patching Gradle Wrapper distributionUrl"
-            # 替换 https\://services.gradle.org/distributions/ 为 aliyun 镜像
-            sed -i "s|https\\\\://services.gradle.org/distributions/|${GRADLE_MIRROR}|g" \$WRAPPER_FILE
-            grep distributionUrl \$WRAPPER_FILE
-        """
-    }
-}
+            when {
+                expression { env.IS_TAG == "true" }
+            }
+            steps {
+                sh """
+                    set -e
+                    WRAPPER_FILE=gradle/wrapper/gradle-wrapper.properties
+                    echo "Patching Gradle Wrapper distributionUrl"
+                    # 注意：这是 shell 注释，不影响 Groovy
+                    sed -i "s|https\\\\://services.gradle.org/distributions/|${GRADLE_MIRROR}|g" \$WRAPPER_FILE
+                    grep distributionUrl \$WRAPPER_FILE
+                """
+            }
+        }
+
 
 
         stage('Build (Multi-Module)') {
