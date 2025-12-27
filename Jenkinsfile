@@ -1,22 +1,14 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'jdk21'
-    }
-
     environment {
-        WS_SERVER_URL = credentials('ws-server-url')
-
+        GRADLE_MIRROR = "https://mirrors.aliyun.com/gradle/distributions/"
+        WS_SERVER_URL = credentials('ws-server-url')  // 你的 WebSocket URL
         R2_ACCOUNT_ID = credentials('r2-account-id')
-        R2_ACCESS_KEY = credentials('r2-access-key-id')
-        R2_SECRET_KEY = credentials('r2-secret-access-key')
-        R2_BUCKET     = credentials('r2-bucket')
-
-        GITHUB_TOKEN  = credentials('github-pat')
-
-        // 阿里云 Gradle 镜像（关键）
-        GRADLE_MIRROR = 'https://mirrors.aliyun.com/gradle/distributions/v9.1.0/gradle-9.1.0-bin.zip'
+        R2_ACCESS_KEY = credentials('r2-access-key')
+        R2_SECRET_KEY = credentials('r2-secret-key')
+        R2_BUCKET = credentials('r2-bucket')
+        GITHUB_TOKEN = credentials('github-token')
     }
 
     stages {
@@ -28,67 +20,114 @@ pipeline {
             }
         }
 
+        stage('Detect Tag') {
+            steps {
+                script {
+                    def tag = sh(
+                        script: "git describe --tags --exact-match || true",
+                        returnStdout: true
+                    ).trim()
+
+                    if (!tag) {
+                        echo "Not a tag build, skipping release stages"
+                        env.IS_TAG = "false"
+                    } else {
+                        echo "Tag detected: ${tag}"
+                        env.IS_TAG = "true"
+                        env.TAG_NAME = tag
+                    }
+                }
+            }
+        }
+
+        stage('Patch Gradle Wrapper (Aliyun Mirror)') {
+            when {
+                expression { env.IS_TAG == "true" }
+            }
+            steps {
+                sh '''
+                    set -e
+                    WRAPPER_FILE=gradle/wrapper/gradle-wrapper.properties
+
+                    echo "Patching Gradle Wrapper distributionUrl"
+                    sed -i 's#https\\://services.gradle.org/distributions/#${GRADLE_MIRROR}#g' $WRAPPER_FILE
+                    grep distributionUrl $WRAPPER_FILE
+                '''
+            }
+        }
+
         stage('Build (Multi-Module)') {
             when {
-                buildingTag()
+                expression { env.IS_TAG == "true" }
             }
             steps {
                 sh '''
                     chmod +x gradlew
                     ./gradlew buildAndGather \
-                      -PwsServerUrl=$WS_SERVER_URL \
-                      -x test \
-                      -Dorg.gradle.daemon=false \
-                      -Dorg.gradle.wrapper.distributionUrl=$GRADLE_MIRROR
+                        -PwsServerUrl=${WS_SERVER_URL} \
+                        -x test \
+                        -Dorg.gradle.daemon=false
                 '''
             }
         }
 
         stage('Prepare Artifacts') {
             when {
-                buildingTag()
+                expression { env.IS_TAG == "true" }
             }
             steps {
                 sh '''
                     mkdir -p artifacts
-                    cp build/gathered-jars/HuHoBot-*.jar artifacts/
-
-                    VERSION=${GIT_TAG_NAME#v}
-                    echo "{\"latest\":\"$VERSION\"}" > artifacts/latest.json
+                    cp build/gathered-jars/HuHoBot-*.jar artifacts/ || true
+                    ls -lah artifacts
                 '''
             }
         }
 
         stage('Upload to R2') {
             when {
-                buildingTag()
+                expression { env.IS_TAG == "true" }
             }
             steps {
                 sh '''
-                    rclone copy artifacts r2:$R2_BUCKET/kotlin \
-                      --s3-provider Cloudflare \
-                      --s3-endpoint https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com \
-                      --s3-access-key-id $R2_ACCESS_KEY \
-                      --s3-secret-access-key $R2_SECRET_KEY
+                    echo "Uploading artifacts to R2"
+                    # 假设你使用 r2-upload-action 或自写脚本
+                    r2-upload \
+                        --account ${R2_ACCOUNT_ID} \
+                        --access-key ${R2_ACCESS_KEY} \
+                        --secret-key ${R2_SECRET_KEY} \
+                        --bucket ${R2_BUCKET} \
+                        --source artifacts \
+                        --destination kotlin
                 '''
             }
         }
 
         stage('Create GitHub Release') {
             when {
-                buildingTag()
+                expression { env.IS_TAG == "true" }
             }
             steps {
                 sh '''
-                    TAG=${GIT_TAG_NAME}
-
-                    gh release delete "$TAG" -y || true
-
-                    gh release create "$TAG" artifacts/HuHoBot-*.jar \
-                      --title "HuHoBot $TAG" \
-                      --notes-file CHANGELOG.md
+                    echo "Creating GitHub Release ${TAG_NAME}"
+                    gh release create ${TAG_NAME} artifacts/* \
+                        --repo HuHoBot/KotlinMergeAdapter \
+                        --title "${TAG_NAME}" \
+                        --notes "Automated release from Jenkins"
                 '''
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Build finished"
+        }
+        success {
+            echo "Build succeeded"
+        }
+        failure {
+            echo "Build failed"
         }
     }
 }
