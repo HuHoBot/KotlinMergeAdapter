@@ -5,8 +5,8 @@ pipeline {
         GRADLE_MIRROR = "https://mirrors.aliyun.com/gradle/distributions/"
         WS_SERVER_URL = credentials('ws-server-url')  // 你的 WebSocket URL
         R2_ACCOUNT_ID = credentials('r2-account-id')
-        R2_ACCESS_KEY = credentials('r2-access-key')
-        R2_SECRET_KEY = credentials('r2-secret-key')
+        R2_ACCESS_KEY = credentials('r2-access-key-id')
+        R2_SECRET_KEY = credentials('r2-secret-access-key')
         R2_BUCKET = credentials('r2-bucket')
         GITHUB_TOKEN = credentials('github-token')
     }
