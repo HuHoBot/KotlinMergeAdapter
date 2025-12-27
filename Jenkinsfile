@@ -45,16 +45,23 @@ pipeline {
                 expression { env.IS_TAG == "true" }
             }
             steps {
-                sh """
+                sh '''
                     set -e
                     WRAPPER_FILE=gradle/wrapper/gradle-wrapper.properties
-                    echo "Patching Gradle Wrapper distributionUrl"
-                    # 注意：这是 shell 注释，不影响 Groovy
-                    sed -i "s|https\\\\://services.gradle.org/distributions/|${GRADLE_MIRROR}|g" \$WRAPPER_FILE
-                    grep distributionUrl \$WRAPPER_FILE
-                """
+                    echo "Replacing Gradle Wrapper distributionUrl with Aliyun mirror"
+
+                    # 删除原来的 distributionUrl 行
+                    sed -i '/^distributionUrl=/d' $WRAPPER_FILE
+
+                    # 写入新的阿里云 URL
+                    echo "distributionUrl=https\\://mirrors.aliyun.com/gradle/distributions/gradle-9.1.0-bin.zip" >> $WRAPPER_FILE
+
+                    # 检查是否生效
+                    grep distributionUrl $WRAPPER_FILE
+                '''
             }
         }
+
 
 
 
