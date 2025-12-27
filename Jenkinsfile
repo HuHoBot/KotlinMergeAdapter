@@ -45,14 +45,14 @@ pipeline {
                 expression { env.IS_TAG == "true" }
             }
             steps {
-                sh '''
+                sh """
                     set -e
                     WRAPPER_FILE=gradle/wrapper/gradle-wrapper.properties
-
                     echo "Patching Gradle Wrapper distributionUrl"
-                    sed -i 's#https\\://services.gradle.org/distributions/#${GRADLE_MIRROR}#g' $WRAPPER_FILE
-                    grep distributionUrl $WRAPPER_FILE
-                '''
+                    sed -i "s#https://services.gradle.org/distributions/#${GRADLE_MIRROR}#g" \$WRAPPER_FILE
+                    grep distributionUrl \$WRAPPER_FILE
+                """
+
             }
         }
 
