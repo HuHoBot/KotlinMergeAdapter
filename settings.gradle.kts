@@ -37,11 +37,5 @@ include(":server-Allay")
 project(":server-Allay").projectDir = file("server/Allay")
 include(":server-NkMot")
 project(":server-NkMot").projectDir = file("server/NkMot")
-include(":server-Architectury")
-project(":server-Architectury").projectDir = file("server/Architectury")
-include(":server-Architectury:common")
-include(":server-Architectury:fabric")
-include(":server-Architectury:forge")
-include(":server-Architectury:neoforge")
 
 rootProject.name = "HuHoBot"
