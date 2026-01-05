@@ -56,6 +56,8 @@ tasks.shadowJar {
     configurations = listOf(shadowCommon)
     archiveFileName.set("HuHoBot-${project.version}-Spigot.jar")
     relocate("com.github.Anon8281.universalScheduler", "cn.huohuas001.huHoBot.spigot.universalScheduler")
+    relocate("kotlinx.coroutines", "cn.huohuas001.huHoBot.libs.coroutines")
+    relocate("io.ktor", "cn.huohuas001.huHoBot.libs.ktor")
     // 去除重复文件（只需在这里配置一次）
     mergeServiceFiles()
 
@@ -69,6 +71,8 @@ tasks.shadowJar {
     exclude("META-INF/proguard/**")
     exclude("META-INF/native-image/**")
     exclude("META-INF/scm/**")
+    exclude("**/module-info.class")
+
 }
 
 val targetJavaVersion = 8
