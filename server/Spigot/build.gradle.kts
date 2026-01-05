@@ -55,9 +55,9 @@ tasks.jar {
 tasks.shadowJar {
     configurations = listOf(shadowCommon)
     archiveFileName.set("HuHoBot-${project.version}-Spigot.jar")
-    relocate("com.github.Anon8281.universalScheduler", "cn.huohuas001.huHoBot.spigot.universalScheduler")
-    relocate("kotlinx.coroutines", "cn.huohuas001.huHoBot.libs.coroutines")
-    relocate("io.ktor", "cn.huohuas001.huHoBot.libs.ktor")
+    relocate("com.github.Anon8281.universalScheduler", "cn.huohuas001.huhobot.spigot.universalScheduler")
+    relocate("kotlinx.coroutines", "cn.huohuas001.huhobot.libs.coroutines")
+    relocate("io.ktor", "cn.huohuas001.huhobot.libs.ktor")
     // 去除重复文件（只需在这里配置一次）
     mergeServiceFiles()
 
