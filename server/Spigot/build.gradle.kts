@@ -22,6 +22,9 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("org.jetbrains:annotations:13.0")
+    compileOnly("org.apache.logging.log4j:log4j-core:2.17.1")
+    compileOnly("org.apache.logging.log4j:log4j-api:2.17.1")
+
     implementation("com.github.Anon8281:UniversalScheduler:0.1.6")
     implementation("com.alibaba.fastjson2:fastjson2:2.0.52")
 

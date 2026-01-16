@@ -1,9 +1,7 @@
 package cn.huohuas001.huhobot.spigot.commands
 
-
 import cn.huohuas001.bot.providers.HExecution
 import cn.huohuas001.huhobot.spigot.HuHoBotSpigot
-import net.md_5.bungee.api.chat.BaseComponent
 import org.bukkit.Bukkit
 import org.bukkit.Server
 import org.bukkit.command.CommandSender
@@ -16,36 +14,43 @@ import org.bukkit.permissions.PermissionAttachmentInfo
 import org.bukkit.plugin.Plugin
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CopyOnWriteArrayList
 
 class BukkitConsoleSender(val plugin: HuHoBotSpigot) : ConsoleCommandSender, HExecution {
-    private val messageList = mutableListOf<String>()
+    private val messageList = CopyOnWriteArrayList<String>()
 
-    override fun isOp(): Boolean {
-        return true
+    // 简化的 Spigot 实现，只覆盖基础方法
+    private val customSpigot = object : CommandSender.Spigot() {
+        override fun sendMessage(component: net.md_5.bungee.api.chat.BaseComponent) {
+            messageList.add(component.toLegacyText())
+        }
+
+        override fun sendMessage(vararg components: net.md_5.bungee.api.chat.BaseComponent) {
+            components.forEach {
+                messageList.add(it.toLegacyText())
+            }
+        }
     }
 
-    override fun setOp(p0: Boolean) {
-        throw UnsupportedOperationException()
+    fun clearMessages() {
+        messageList.clear()
     }
 
-    override fun isPermissionSet(p0: String): Boolean {
-        return false
+    fun getAndClearMessages(): List<String> {
+        val messages = messageList.toList()
+        messageList.clear()
+        return messages
     }
 
-    override fun isPermissionSet(p0: Permission): Boolean {
-        return false
-    }
+    override fun isOp(): Boolean = true
+    override fun setOp(p0: Boolean) {}
 
-    override fun hasPermission(p0: String): Boolean {
-        return true
-    }
-
-    override fun hasPermission(p0: Permission): Boolean {
-        return true
-    }
+    override fun isPermissionSet(p0: String): Boolean = false
+    override fun isPermissionSet(p0: Permission): Boolean = false
+    override fun hasPermission(p0: String): Boolean = true
+    override fun hasPermission(p0: Permission): Boolean = true
 
     override fun addAttachment(p0: Plugin, p1: String, p2: Boolean): PermissionAttachment {
-        messageList.add(p1)
         throw UnsupportedOperationException()
     }
 
@@ -54,7 +59,6 @@ class BukkitConsoleSender(val plugin: HuHoBotSpigot) : ConsoleCommandSender, HEx
     }
 
     override fun addAttachment(p0: Plugin, p1: String, p2: Boolean, p3: Int): PermissionAttachment? {
-        messageList.add(p1)
         throw UnsupportedOperationException()
     }
 
@@ -62,16 +66,11 @@ class BukkitConsoleSender(val plugin: HuHoBotSpigot) : ConsoleCommandSender, HEx
         throw UnsupportedOperationException()
     }
 
-    override fun removeAttachment(p0: PermissionAttachment) {
-        throw UnsupportedOperationException()
-    }
-
-    override fun recalculatePermissions() {
-        throw UnsupportedOperationException()
-    }
+    override fun removeAttachment(p0: PermissionAttachment) {}
+    override fun recalculatePermissions() {}
 
     override fun getEffectivePermissions(): MutableSet<PermissionAttachmentInfo> {
-        throw UnsupportedOperationException()
+        return mutableSetOf()
     }
 
     override fun sendMessage(p0: String) {
@@ -79,9 +78,7 @@ class BukkitConsoleSender(val plugin: HuHoBotSpigot) : ConsoleCommandSender, HEx
     }
 
     override fun sendMessage(vararg p0: String?) {
-        for (s in p0) {
-            sendMessage(s!!)
-        }
+        p0.filterNotNull().forEach { messageList.add(it) }
     }
 
     override fun sendMessage(p0: UUID?, p1: String) {
@@ -89,42 +86,21 @@ class BukkitConsoleSender(val plugin: HuHoBotSpigot) : ConsoleCommandSender, HEx
     }
 
     override fun sendMessage(p0: UUID?, vararg p1: String?) {
-        for (s in p1) {
-            sendMessage(p0, s!!)
-        }
+        p1.filterNotNull().forEach { messageList.add(it) }
     }
 
-    override fun getServer(): Server {
-        return Bukkit.getServer()
-    }
-
-    override fun getName(): String {
-        return "CONSOLE"
-    }
+    override fun getServer(): Server = Bukkit.getServer()
+    override fun getName(): String = "CONSOLE"
 
     override fun spigot(): CommandSender.Spigot {
-        throw UnsupportedOperationException()
+        return customSpigot
     }
 
-    override fun isConversing(): Boolean {
-        throw UnsupportedOperationException()
-    }
-
-    override fun acceptConversationInput(p0: String) {
-        messageList.add(p0)
-    }
-
-    override fun beginConversation(p0: Conversation): Boolean {
-        throw UnsupportedOperationException()
-    }
-
-    override fun abandonConversation(p0: Conversation) {
-        throw UnsupportedOperationException()
-    }
-
-    override fun abandonConversation(p0: Conversation, p1: ConversationAbandonedEvent) {
-        throw UnsupportedOperationException()
-    }
+    override fun isConversing(): Boolean = false
+    override fun acceptConversationInput(p0: String) {}
+    override fun beginConversation(p0: Conversation): Boolean = false
+    override fun abandonConversation(p0: Conversation) {}
+    override fun abandonConversation(p0: Conversation, p1: ConversationAbandonedEvent) {}
 
     override fun sendRawMessage(p0: String) {
         messageList.add(p0)
@@ -141,18 +117,16 @@ class BukkitConsoleSender(val plugin: HuHoBotSpigot) : ConsoleCommandSender, HEx
     override fun execute(command: String): CompletableFuture<HExecution> {
         val future = CompletableFuture<HExecution>()
 
-        // 在主线程中执行命令
-        plugin.submit{
+        clearMessages()
+
+        plugin.submit {
             try {
                 Bukkit.dispatchCommand(this, command)
 
-                // 异步等待2秒后完成future
-                CompletableFuture.supplyAsync {
-                    Thread.sleep(2 * 1000L)
-                    this
-                }.thenAccept { result ->
-                    future.complete(result)
-                }
+                Bukkit.getScheduler().runTaskLater(plugin, Runnable {
+                    future.complete(this)
+                }, 40L)
+
             } catch (e: Exception) {
                 future.completeExceptionally(e)
             }

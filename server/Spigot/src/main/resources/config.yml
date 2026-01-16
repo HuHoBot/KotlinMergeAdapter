@@ -29,10 +29,6 @@ customCommand:
     command: "whitelist add &1"
     permission: 1
 
-CommandExecutionSort:
-  - "NATIVE"
-  - "DEDICATED_SERVER"
-  - "MINECRAFT_SERVER"
-  - "SIMULATE_CONSOLE"
+CommandSender: "Hybrid"
 
 version: 5

@@ -8,9 +8,7 @@ import cn.huohuas001.bot.providers.HExecution
 import cn.huohuas001.bot.tools.*
 import cn.huohuas001.huhobot.spigot.api.BotCustomCommand
 import cn.huohuas001.huhobot.spigot.commands.BukkitConsoleSender
-import cn.huohuas001.huhobot.spigot.commands.DecidatedServerSender
-import cn.huohuas001.huhobot.spigot.commands.MinecraftServerSender
-import cn.huohuas001.huhobot.spigot.commands.NativeServerSender
+import cn.huohuas001.huhobot.spigot.commands.HybridCommandExecutor
 import cn.huohuas001.huhobot.spigot.events.GameChat
 import cn.huohuas001.huhobot.spigot.events.QueryAllowList
 import cn.huohuas001.huhobot.spigot.events.QueryOnline
@@ -21,6 +19,7 @@ import com.github.Anon8281.universalScheduler.UniversalScheduler
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.Locale
 import java.util.concurrent.CompletableFuture
 import java.util.logging.Logger
 
@@ -81,47 +80,21 @@ class HuHoBotSpigot: JavaPlugin(),HuHoBot {
 
     override fun sendCommand(command: String): CompletableFuture<HExecution> {
         val senderInstance: HExecution = sender.constructors[0].newInstance(this) as HExecution
-        for (method in senderInstance.javaClass.methods) {
-            if (method.name.contains("check") && method.parameterCount == 0) {
-                method.invoke(senderInstance)
-            } else if (method.name.contains("check")) {
-                method.invoke(senderInstance)
-            }
-        }
         return senderInstance.execute(command)
     }
 
     fun setSender() {
-        config.getStringList("CommandExecutionSort").forEach {
-            try {
-                when (it.uppercase()) {
-                    "NATIVE" -> if (NativeServerSender(this).check()) {
-                        sender = NativeServerSender::class.java
-                        pluginLogger.info("已启用使用原生命令执行器")
-                         return
-                    }
-                    "DEDICATED_SERVER" -> if (DecidatedServerSender(this).check()) {
-                        sender = DecidatedServerSender::class.java
-                        pluginLogger.info("已启用使用Dedicated Server执行器")
-                         return
-                    }
-                    "MINECRAFT_SERVER" -> if (MinecraftServerSender(this).check()) {
-                        sender = MinecraftServerSender::class.java
-                        pluginLogger.info("已启用使用Minecraft Server执行器")
-                         return
-                    }
-                    "SIMULATE_CONSOLE" -> {
-                        sender = BukkitConsoleSender::class.java
-                        pluginLogger.info("已启用使用模拟控制台执行器")
-                         return
-                    }
-                }
-            } catch (e: NoClassDefFoundError) {
-                pluginLogger.warning("执行器 $it 加载失败: ${e.message}")
-                // 继续尝试下一个执行器
+        val senderType = config.getString("CommandSender")?: "bukkit"
+        when (senderType.lowercase(Locale.getDefault())) {
+            "hybrid" -> {
+                sender = HybridCommandExecutor::class.java
+                pluginLogger.info("已启用使用混合控制台执行器")
+            }
+            else -> {
+                sender = BukkitConsoleSender::class.java
+                pluginLogger.info("已启用使用模拟控制台执行器")
             }
         }
-
     }
 
     override fun submit(task: Runnable): Cancelable {
