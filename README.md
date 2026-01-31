@@ -22,7 +22,8 @@
 - **无缝绑定**：通过WebSocket实现服务器与控制端即时绑定
 - **多平台支持**：适配Spigot/Paper 1.8+ 全版本
 - **多平台支持**: 支持Nukkit/Allay/
-- **多平台支持**: 支持Forge/Fabric
+- **多平台支持**: 支持Forge/Fabric [点我跳转](https://github.com/HuHoBot/ArchitecturyAdapter)
+- **多平台支持**: 支持Velocity/BungeeCord (需按文档配置)
 - **智能风控规避**：基于事件驱动的非侵入式通信协议
 - **支持Folia**: 支持Folia服务端运行
 

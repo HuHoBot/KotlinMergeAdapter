@@ -1,0 +1,12 @@
+{
+  "id": "huhobot",
+  "name": "HuHoBot",
+  "version": "${version}",
+  "description": "HuHoBot Velocity Adapter",
+  "url": "https://github.com/HuoHuas001/HuHoBot",
+  "authors": [
+    "HuoHuas001"
+  ],
+  "dependencies": [],
+  "main": "cn.huohuas001.huhobot.velocity.HuHoBotVelocity"
+}
