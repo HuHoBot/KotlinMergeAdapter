@@ -160,44 +160,65 @@ object ClientManager {
     private fun performReconnect() {
         val plugin = BotShared.getPlugin()
 
-        while (shouldReconnect && ReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-            ReconnectAttempts++
-
-            // 检查是否已经有活跃连接
-            if (isOpen()) {
-                plugin.log_info("检测到已有活跃连接，停止重连")
-                break
-            }
-
-            plugin.log_info("正在尝试重新连接,这是第($ReconnectAttempts/$MAX_RECONNECT_ATTEMPTS)次连接")
-
-            // 尝试连接
-            if (connectServer()) {
-                // 连接成功，等待一段时间确认连接稳定
-                Thread.sleep(1000)
-                if (isOpen()) {
-                    plugin.log_info("重连成功!")
-                    break
-                }
-            }
-
-            // 如果不是最后一次尝试，等待后继续
-            if (ReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                try {
-                    Thread.sleep(RECONNECT_DELAY * 1000) // 等待重连延迟
-                } catch (e: InterruptedException) {
-                    break
-                }
-            }
+        if (!shouldReconnect) {
+            isReconnecting.set(false)
+            return
         }
 
-        // 重连结束，无论成功与否都要重置状态
+        // 检查次数是否超限
         if (ReconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
             plugin.log_warning("重连尝试已达到最大次数，将不再尝试重新连接。")
+            isReconnecting.set(false)
+            ReconnectAttempts = 0
+            return
         }
 
-        isReconnecting.set(false)
-        ReconnectAttempts = 0
+        ReconnectAttempts++
+
+        // 检查是否已经有活跃连接
+        if (isOpen()) {
+            plugin.log_info("检测到已有活跃连接，停止重连")
+            isReconnecting.set(false)
+            ReconnectAttempts = 0
+            return
+        }
+
+        plugin.log_info("正在尝试重新连接,这是第($ReconnectAttempts/$MAX_RECONNECT_ATTEMPTS)次连接")
+
+        // 尝试连接
+        if (connectServer()) {
+            // 连接发起成功，1秒后检查连接状态
+            currentTask = plugin.submitLater(20L) {
+                checkConnectionStatus()
+            }
+        } else {
+            // 连接发起失败，进入下一次等待
+            scheduleNextAttempt()
+        }
+    }
+
+    private fun checkConnectionStatus() {
+        val plugin = BotShared.getPlugin()
+        if (isOpen()) {
+            plugin.log_info("重连成功!")
+            isReconnecting.set(false)
+            ReconnectAttempts = 0
+        } else {
+            scheduleNextAttempt()
+        }
+    }
+
+    private fun scheduleNextAttempt() {
+        if (ReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+            val plugin = BotShared.getPlugin()
+            // 等待重连延迟
+            currentTask = plugin.submitLater(RECONNECT_DELAY * 20L) {
+                performReconnect()
+            }
+        } else {
+            // 再次调用以触发结束逻辑
+            performReconnect()
+        }
     }
 
     fun clientReconnect() {
