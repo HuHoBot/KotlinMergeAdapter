@@ -1,6 +1,7 @@
-# HuHoBot-Adapter v2.0.8
+# HuHoBot-Adapter v2.0.9
 
-feat(server): 添加对 Velocity 和 BungeeCord 平台的支持
+feat(bot): 优化重连机制并更新配置版本
+- 重构了 `ClientManager` 中的重连逻辑，改用异步任务调度替代同步等待
 
-- 添加了 BungeeCord 服务端适配器模块
-- 添加了 Velocity 服务端适配器模块
+feat(spigot): 优化重连机制并更新配置版本
+- 更新配置，添加`CommandSender`配置项，移除`CommandExecutionSort`配置项
