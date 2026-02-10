@@ -37,9 +37,7 @@ include(":server-Allay")
 project(":server-Allay").projectDir = file("server/Allay")
 include(":server-NkMot")
 project(":server-NkMot").projectDir = file("server/NkMot")
-include(":server-Velocity")
-project(":server-Velocity").projectDir = file("server/Velocity")
-include(":server-BungeeCord")
-project(":server-BungeeCord").projectDir = file("server/BungeeCord")
+include(":server-Proxy")
+project(":server-Proxy").projectDir = file("server/Proxy")
 
 rootProject.name = "HuHoBot"

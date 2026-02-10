@@ -117,7 +117,4 @@ tasks.processResources {
     filesMatching("plugin.yml") {
         expand(props)
     }
-    filesMatching("config.yml") {
-        expand(props)
-    }
 }
