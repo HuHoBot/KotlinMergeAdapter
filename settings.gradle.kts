@@ -31,15 +31,9 @@ plugins {
 // Learn more about structuring projects with Gradle - https://docs.gradle.org/8.7/userguide/multi_project_builds.html
 include(":common-Bot")
 project(":common-Bot").projectDir = file("common/Bot")
-include(":server-Spigot")
-project(":server-Spigot").projectDir = file("server/Spigot")
-include(":server-Allay")
-project(":server-Allay").projectDir = file("server/Allay")
+include(":mixServer")
+project(":mixServer").projectDir = file("server/mixServer")
 include(":server-NkMot")
 project(":server-NkMot").projectDir = file("server/NkMot")
-include(":server-Velocity")
-project(":server-Velocity").projectDir = file("server/Velocity")
-include(":server-BungeeCord")
-project(":server-BungeeCord").projectDir = file("server/BungeeCord")
 
 rootProject.name = "HuHoBot"

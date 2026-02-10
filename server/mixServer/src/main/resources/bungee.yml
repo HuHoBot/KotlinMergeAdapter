@@ -1,0 +1,5 @@
+name: HuHoBot
+version: '${version}'
+main: bungee.HuHoBotBungee
+author: HuoHuas001
+description: HuHoBot BungeeCord Adapter

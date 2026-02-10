@@ -10,10 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/common/Bot" />
             <option value="$PROJECT_DIR$/server/Allay" />
-            <option value="$PROJECT_DIR$/server/BungeeCord" />
             <option value="$PROJECT_DIR$/server/NkMot" />
-            <option value="$PROJECT_DIR$/server/Spigot" />
-            <option value="$PROJECT_DIR$/server/Velocity" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="true" />
