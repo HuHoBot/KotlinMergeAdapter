@@ -1,19 +1,17 @@
 package cn.huohuas001.huhobot.spigot.events
 
 import cn.huohuas001.bot.events.BaseEvent
+import cn.huohuas001.bot.tools.CollectionUtils
 import cn.huohuas001.huhobot.spigot.HuHoBotSpigot
 import cn.huohuas001.huhobot.spigot.api.BotQueryWhiteList
-import cn.huohuas001.huhobot.spigot.tools.SetController
 import com.alibaba.fastjson2.JSONObject
 import org.bukkit.Bukkit
-import org.bukkit.OfflinePlayer
 
 class QueryAllowList(val plugin: HuHoBotSpigot): BaseEvent() {
 
     fun callEvent(): Boolean {
-        val orWhitelist: MutableSet<OfflinePlayer?> = plugin.server.whitelistedPlayers
-        val whiteList: Set<String> = SetController.convertToPlayerNames(orWhitelist)
-
+        val orWhitelist = plugin.server.whitelistedPlayers
+        val whiteList: Set<String> = orWhitelist.mapNotNull { it?.name }.toSet()
 
         // 根据参数类型创建事件
         val event: BotQueryWhiteList = createEvent()
@@ -22,7 +20,6 @@ class QueryAllowList(val plugin: HuHoBotSpigot): BaseEvent() {
         if (event.isCancelled) {
             return false // 事件被取消时中断处理
         }
-
 
         // 保留原有处理流程
         val rBody = JSONObject()
@@ -59,13 +56,13 @@ class QueryAllowList(val plugin: HuHoBotSpigot): BaseEvent() {
             return
         }
 
-        val results: List<String> = SetController.searchInSet(whitelist, key)
+        val results: List<String> = CollectionUtils.searchInSet(whitelist, key)
         event.responseList(results, 0) // 通过事件发送响应
     }
 
     private fun handlePage(event: BotQueryWhiteList, whitelist: Set<String>, sb: StringBuilder) {
         val page = event.pages
-        val pages: List<List<String>> = SetController.chunkSet(whitelist, 10)
+        val pages: List<List<String>> = CollectionUtils.chunkSet(whitelist, 10)
 
         if (page - 1 >= pages.size) {
             sb.append("没有该页码\n")
@@ -76,7 +73,7 @@ class QueryAllowList(val plugin: HuHoBotSpigot): BaseEvent() {
     }
 
     private fun handleDefault(event: BotQueryWhiteList, whitelist: Set<String>) {
-        val pages: List<List<String>> = SetController.chunkSet(whitelist, 10)
+        val pages: List<List<String>> = CollectionUtils.chunkSet(whitelist, 10)
         event.responseList(pages[0], pages.size) // 默认发送第一页
     }
 

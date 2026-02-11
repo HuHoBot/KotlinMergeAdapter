@@ -13,6 +13,7 @@ object ClientManager {
 
     private const val RECONNECT_DELAY: Long = 5 // 重连延迟时间，单位为秒
     private const val MAX_RECONNECT_ATTEMPTS = 5 // 最大重连尝试次数
+    private const val AUTO_DISCONNECT_TICKS: Long = 6 * 60 * 60 * 20L // 自动断开超时时间（6小时，单位为游戏tick）
     private var ReconnectAttempts = 0
     private var shouldReconnect = true
 
@@ -58,7 +59,7 @@ object ClientManager {
     fun setAutoDisConnectTask() {
         val plugin = BotShared.getPlugin()
         if (autoDisConnectTask == null) {
-            autoDisConnectTask = plugin.submitLater(6 * 60 * 60 * 20L) { this.autoDisConnectClient() }
+            autoDisConnectTask = plugin.submitLater(AUTO_DISCONNECT_TICKS) { this.autoDisConnectClient() }
         } else {
             autoDisConnectTask!!.cancel()
             autoDisConnectTask = null

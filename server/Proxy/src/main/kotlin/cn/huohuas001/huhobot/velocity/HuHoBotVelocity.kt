@@ -5,7 +5,6 @@ import cn.huohuas001.bot.HuHoBot
 import cn.huohuas001.bot.events.BaseEvent
 import cn.huohuas001.bot.events.BindRequest
 import cn.huohuas001.bot.provider.*
-import cn.huohuas001.bot.providers.HExecution
 import cn.huohuas001.bot.tools.Cancelable
 import cn.huohuas001.huhobot.common.HuHoBotProxy
 import cn.huohuas001.huhobot.velocity.commands.HuHoBotCommand

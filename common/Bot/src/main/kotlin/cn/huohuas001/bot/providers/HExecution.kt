@@ -1,4 +1,4 @@
-package cn.huohuas001.bot.providers
+package cn.huohuas001.bot.provider
 
 import java.util.concurrent.CompletableFuture
 

@@ -1,6 +1,6 @@
 package cn.huohuas001.huhobot.velocity.commands
 
-import cn.huohuas001.bot.providers.HExecution
+import cn.huohuas001.bot.provider.HExecution
 import cn.huohuas001.huhobot.common.commands.ProxyConsoleSender
 import cn.huohuas001.huhobot.velocity.HuHoBotVelocity
 import java.util.concurrent.CompletableFuture

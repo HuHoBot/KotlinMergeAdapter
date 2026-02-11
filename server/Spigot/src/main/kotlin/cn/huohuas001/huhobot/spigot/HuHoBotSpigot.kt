@@ -4,7 +4,6 @@ import cn.huohuas001.bot.ClientManager
 import cn.huohuas001.bot.HuHoBot
 import cn.huohuas001.bot.events.*
 import cn.huohuas001.bot.provider.*
-import cn.huohuas001.bot.providers.HExecution
 import cn.huohuas001.bot.tools.*
 import cn.huohuas001.huhobot.spigot.api.BotCustomCommand
 import cn.huohuas001.huhobot.spigot.commands.BukkitConsoleSender

@@ -8,7 +8,7 @@ import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.provider.ChatFormat
 import cn.huohuas001.bot.provider.CustomCommandDetail
 import cn.huohuas001.bot.provider.Motd
-import cn.huohuas001.bot.providers.HExecution
+import cn.huohuas001.bot.provider.HExecution
 import cn.huohuas001.bot.tools.Cancelable
 import cn.huohuas001.huhobot.allay.commands.HuHoBotCommand
 import cn.huohuas001.huhobot.allay.events.QueryAllowList

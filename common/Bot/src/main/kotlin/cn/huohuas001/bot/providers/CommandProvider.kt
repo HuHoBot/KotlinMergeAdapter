@@ -1,6 +1,6 @@
 package cn.huohuas001.bot.provider
 
-import cn.huohuas001.bot.providers.HExecution
+
 import java.util.concurrent.CompletableFuture
 
 interface CommandProvider {

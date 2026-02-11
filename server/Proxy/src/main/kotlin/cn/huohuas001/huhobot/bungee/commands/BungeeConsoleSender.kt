@@ -1,6 +1,6 @@
 package cn.huohuas001.huhobot.bungee.commands
 
-import cn.huohuas001.bot.providers.HExecution
+import cn.huohuas001.bot.provider.HExecution
 import cn.huohuas001.huhobot.bungee.HuHoBotBungee
 import cn.huohuas001.huhobot.common.commands.ProxyConsoleSender
 import net.md_5.bungee.api.ProxyServer

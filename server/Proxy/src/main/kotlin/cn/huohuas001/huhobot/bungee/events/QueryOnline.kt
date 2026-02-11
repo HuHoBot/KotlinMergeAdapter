@@ -1,32 +1,14 @@
 package cn.huohuas001.huhobot.bungee.events
 
-import cn.huohuas001.bot.ClientManager
-import cn.huohuas001.bot.events.BaseEvent
+import cn.huohuas001.bot.HuHoBot
+import cn.huohuas001.bot.events.AbstractQueryOnline
 import cn.huohuas001.huhobot.bungee.HuHoBotBungee
 
-class QueryOnline(val plugin: HuHoBotBungee) : BaseEvent() {
+class QueryOnline(val plugin: HuHoBotBungee) : AbstractQueryOnline() {
 
-    override fun run(): Boolean {
-        val outputOnlineList: Boolean = plugin.getMotd().outputOnlineList
-        val text: String = plugin.getMotd().text
+    override fun getPlugin(): HuHoBot = plugin
 
-        val onlineNameString = StringBuilder()
-        var onlineSize = -1
-
-        if (outputOnlineList) {
-            onlineNameString.append("\n在线玩家列表：\n")
-            val onlineList = plugin.proxy.players
-            for (player in onlineList) {
-                val playerName = player.name
-                onlineNameString.append(playerName).append("\n")
-            }
-            onlineSize = onlineList.count()
-        }
-
-        onlineNameString.append(text.replace("{online}", onlineSize.toString()))
-
-        ClientManager.postMotd(onlineNameString.toString(), mPackId)
-
-        return true
+    override fun getOnlinePlayerNames(): List<String> {
+        return plugin.proxy.players.map { it.name }
     }
 }

@@ -16,10 +16,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 import java.net.URI
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 
 class WsClient(private val plugin: HuHoBot, val serverUri: URI) : CoroutineScope {
-    private val responseFutureList = mutableMapOf<String, CompletableFuture<JSONObject>>()
+    private val responseFutureList = ConcurrentHashMap<String, CompletableFuture<JSONObject>>()
     private val client: HttpClient = HttpClient {
         install(WebSockets)
     }

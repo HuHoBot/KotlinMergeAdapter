@@ -1,6 +1,6 @@
 package cn.huohuas001.huhobot.common.commands
 
-import cn.huohuas001.bot.providers.HExecution
+import cn.huohuas001.bot.provider.HExecution
 import cn.huohuas001.huhobot.common.HuHoBotProxy
 import cn.huohuas001.huhobot.common.tools.CommandUtils
 import java.util.concurrent.CompletableFuture
