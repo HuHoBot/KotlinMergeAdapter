@@ -64,6 +64,7 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
         defaultConfig.set("whiteList.del", "whitelist remove {name}")
 
         defaultConfig.set("callbackConvertImg", 0)
+        defaultConfig.set("filterRegex", listOf("\\u001B\\[[;\\d]*[ -/]*[@-~]"))
         defaultConfig.set("customCommand", emptyList<Any>())
 
         // Redis 配置
@@ -163,6 +164,10 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
 
     override fun getCallbackConvertImg(): Int {
         return config.getInt("callbackConvertImg", 0)
+    }
+
+    override fun getFilterRegexList(): List<String> {
+        return config.getStringList("filterRegex")
     }
 
     override fun isRedisEnabled(): Boolean {

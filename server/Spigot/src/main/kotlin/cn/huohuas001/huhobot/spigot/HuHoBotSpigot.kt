@@ -165,6 +165,10 @@ class HuHoBotSpigot: JavaPlugin(),HuHoBot {
         return config.getInt("callbackConvertImg",0)
     }
 
+    override fun getFilterRegexList(): List<String> {
+        return config.getStringList("filterRegex")
+    }
+
     override fun loadCustomCommand() {
         configManager.loadCommandsFromConfig()
     }

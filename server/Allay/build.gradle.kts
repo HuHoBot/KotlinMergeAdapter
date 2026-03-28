@@ -1,7 +1,9 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     java
     kotlin("jvm")
-    id("org.allaymc.gradle.plugin") version "0.1.2"
+    id("org.allaymc.gradle.plugin") version "0.2.1"
     id("com.gradleup.shadow")
 }
 
@@ -54,6 +56,15 @@ tasks.withType<AbstractCopyTask>().configureEach {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+tasks.processResources {
+    inputs.property("pluginVersion", project.version.toString())
+    filteringCharset = "UTF-8"
+    filesMatching("plugin.json") {
+        filter { line ->
+            line.replace("\"version\": \"0.0.0\"", "\"version\": \"${project.version}\"")
+        }
+    }
+}
 
 repositories {
     mavenCentral()

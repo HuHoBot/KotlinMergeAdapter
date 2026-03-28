@@ -72,6 +72,7 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
         config.node("whiteList", "del").set("whitelist remove {name}")
 
         config.node("callbackConvertImg").set(0)
+        config.node("filterRegex").setList(String::class.java, listOf("\\u001B\\[[;\\d]*[ -/]*[@-~]"))
         config.node("customCommand").setList(Map::class.java, emptyList())
 
         // Redis 配置
@@ -172,6 +173,10 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
 
     override fun getCallbackConvertImg(): Int {
         return config.node("callbackConvertImg").getInt(0)
+    }
+
+    override fun getFilterRegexList(): List<String> {
+        return config.node("filterRegex").getList(String::class.java, emptyList()) ?: emptyList()
     }
 
     override fun isRedisEnabled(): Boolean {

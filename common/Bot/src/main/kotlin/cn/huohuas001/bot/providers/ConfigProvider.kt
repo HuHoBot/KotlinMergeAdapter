@@ -1,5 +1,7 @@
 package cn.huohuas001.bot.provider
 
+import cn.huohuas001.bot.tools.filterTextByRegex
+
 class ChatFormat(
     val fromGame: String,
     val fromGroup: String,
@@ -30,6 +32,13 @@ class CustomCommandDetail(
 interface ConfigProvider {
     fun getChatFormat(): ChatFormat
     fun getMotd(): Motd
+    fun getFilterRegexList(): List<String> {
+        return emptyList()
+    }
+
+    fun filterText(text: String): String {
+        return filterTextByRegex(text, getFilterRegexList())
+    }
 
     fun getServerId(): String
     fun setServerId(serverId: String)

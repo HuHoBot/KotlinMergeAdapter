@@ -133,6 +133,10 @@ class HuHoBotNkMot: PluginBase(), HuHoBot {
         return config.callbackConvertImg
     }
 
+    override fun getFilterRegexList(): List<String> {
+        return config.filterRegex
+    }
+
     override fun loadCustomCommand() {
         val commands = config.customCommands
 

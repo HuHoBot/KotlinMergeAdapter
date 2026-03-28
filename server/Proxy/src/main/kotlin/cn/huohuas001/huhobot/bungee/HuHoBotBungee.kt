@@ -157,6 +157,10 @@ class HuHoBotBungee : Plugin(), HuHoBotProxy {
         return configManager.getCallbackConvertImg()
     }
 
+    override fun getFilterRegexList(): List<String> {
+        return configManager.getFilterRegexList()
+    }
+
     override fun loadCustomCommand() {
         configManager.loadCommandsFromConfig()
     }

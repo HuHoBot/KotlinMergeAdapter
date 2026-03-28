@@ -14,6 +14,7 @@ interface IConfigManager {
     fun getMotd(): Motd
     fun getWhiteList(): WhiteList
     fun getCallbackConvertImg(): Int
+    fun getFilterRegexList(): List<String>
     fun loadCommandsFromConfig()
     fun reloadConfig(): Boolean
 

@@ -16,7 +16,7 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
 
     private val configFile: File = File(plugin.dataFolder, "config.yml")
     private val oldConfigFile: File = File(plugin.dataFolder, "config_old.yml")
-    private val version: Int = 6
+    private val version: Int = 7
 
     init {
         if (checkConfig()) {
@@ -48,6 +48,14 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
         }
     }
 
+    // 添加从版本6到版本7的迁移方法
+    private fun migrateFromV6ToV7(oldConfig: FileConfiguration, newConfig: FileConfiguration) {
+        if (!newConfig.contains("filterRegex")) {
+            newConfig.set("filterRegex", listOf("\\u001B\\[[;\\d]*[ -/]*[@-~]"))
+            plugin.pluginLogger.info("已添加新的配置项: filterRegex")
+        }
+    }
+
     fun migrateConfig() {
         try {
             // 1. 备份旧配置
@@ -69,10 +77,15 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
 
                 // 根据旧版本号执行相应的迁移
                 when (oldVersion) {
+                    6 -> {
+                        migrateFromV6ToV7(oldConfig, newConfig)
+                        plugin.pluginLogger.info("配置文件从版本6升级到7")
+                    }
                     5 -> {
                         // 从版本5迁移到版本6
                         migrateFromV5ToV6(oldConfig, newConfig)
-                        plugin.pluginLogger.info("配置文件从版本5升级到6")
+                        migrateFromV6ToV7(oldConfig, newConfig)
+                        plugin.pluginLogger.info("配置文件从版本5升级到7")
                     }
                     // 如果还有其他旧版本，可以继续添加
                     in 0..4 -> {

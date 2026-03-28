@@ -23,6 +23,8 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
         private set
     var callbackConvertImg: Int
         private set
+    var filterRegex: List<String>
+        private set
 
     init {
         plugin.saveResource("config.yml")
@@ -58,6 +60,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
                     }
                 ))
                 put("callbackConvertImg",0)
+                put("filterRegex", listOf("\\u001B\\[[;\\d]*[ -/]*[@-~]"))
                 put("version", 1)
             }
         )
@@ -71,6 +74,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
             CustomCommand(section as ConfigSection)
         }
         callbackConvertImg = config.getInt("callbackConvertImg",0)
+        filterRegex = config.getStringList("filterRegex")
         version = config.getInt("version", 0) // 带默认值读取
 
         if (version < currentVersion) {

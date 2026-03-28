@@ -73,6 +73,10 @@ public class HuHoBotConfig extends OkaeriConfig {
     @Comment("需要命令回调转图片的行数(0代表不转)")
     public int callbackConvertImg = 0;
 
+    @Getter
+    @Comment("正则过滤列表，逐条匹配并删除命中内容")
+    public List<String> filterRegex = Arrays.asList("\\u001B\\[[;\\d]*[ -/]*[@-~]");
+
     // region 自定义命令
     @Getter
     @Comment("自定义命令列表")

@@ -21,6 +21,9 @@ whiteList:
 
 callbackConvertImg: 0
 
+filterRegex:
+  - '\u001B\[[;\d]*[ -/]*[@-~]'
+
 customCommand:
   - key: "加白名"
     command: "whitelist add &1"

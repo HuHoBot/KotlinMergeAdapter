@@ -1,6 +1,7 @@
 package cn.huohuas001.bot.events
 
 import cn.huohuas001.bot.ClientManager
+import cn.huohuas001.bot.HuHoBot
 import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.WsClient
 import com.alibaba.fastjson2.JSONObject
@@ -29,11 +30,13 @@ open class BaseEvent {
         plugin.submit{
             val ret = plugin.sendCommand(command)
             ret.thenAccept {
+                val plugin = BotShared.getPlugin()
                 val retText = it.getRawString()
-                if (retText.isNotEmpty()) {
-                    ClientManager.postRespone("已执行.\n$retText", "success", mPackId);
-                }else{
-                    ClientManager.postRespone("已执行.\n无返回结果", "success", mPackId);
+                val filteredText = plugin.filterText(retText)
+                if (filteredText.isNotEmpty()) {
+                    ClientManager.postRespone("已执行.\n$filteredText", "success", mPackId)
+                } else {
+                    ClientManager.postRespone("已执行.\n无返回结果", "success", mPackId)
                 }
             }
 
