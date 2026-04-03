@@ -33,9 +33,9 @@ dependencies {
         exclude(group = "org.jetbrains")
     }
 
-    shadowCommon("io.ktor:ktor-client-websockets:1.6.8")
-    shadowCommon("io.ktor:ktor-client-cio:1.6.8")
-    shadowCommon("io.ktor:ktor-client-core:1.6.8")
+    shadowCommon("io.ktor:ktor-client-websockets:2.3.12")
+    shadowCommon("io.ktor:ktor-client-cio:2.3.12")
+    shadowCommon("io.ktor:ktor-client-core:2.3.12")
     shadowCommon("org.slf4j:slf4j-simple:1.7.36")
 
     // Coroutines

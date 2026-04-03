@@ -5,15 +5,15 @@ import cn.huohuas001.bot.tools.getPackID
 import com.alibaba.fastjson2.JSON
 import com.alibaba.fastjson2.JSONObject
 import io.ktor.client.*
-import io.ktor.client.features.websocket.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
-import io.ktor.http.cio.websocket.CloseReason
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.WebSocketSession
-import io.ktor.http.cio.websocket.close
-import io.ktor.http.cio.websocket.readText
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.Frame
+import io.ktor.websocket.WebSocketSession
+import io.ktor.websocket.close
+import io.ktor.websocket.readText
 import java.net.URI
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
@@ -36,7 +36,7 @@ class WsClient(private val plugin: HuHoBot, val serverUri: URI) : CoroutineScope
         launch {
             try {
                 val url = serverUri.toString()
-                client.webSocket(url) {
+                client.webSocket(urlString = url) {
                     webSocketSession = this
                     plugin.log_info("服务端连接成功.")
                     ClientManager.cancelCurrentTask()

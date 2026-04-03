@@ -30,9 +30,9 @@ dependencies {
 
     implementation("com.alibaba.fastjson2:fastjson2:2.0.52")
 
-    implementation("io.ktor:ktor-client-websockets:1.6.8")
-    implementation("io.ktor:ktor-client-cio:1.6.8")
-    implementation("io.ktor:ktor-client-core:1.6.8") {
+    implementation("io.ktor:ktor-client-websockets:2.3.12")
+    implementation("io.ktor:ktor-client-cio:2.3.12")
+    implementation("io.ktor:ktor-client-core:2.3.12") {
         exclude(group = "org.slf4j")
         exclude(group = "org.yaml")
     }
@@ -44,9 +44,9 @@ dependencies {
     shadowCommon("com.alibaba.fastjson2:fastjson2:2.0.52")
     shadowCommon("com.github.Anon8281:UniversalScheduler:0.1.6")
 
-    shadowCommon("io.ktor:ktor-client-websockets:1.6.8")
-    shadowCommon("io.ktor:ktor-client-cio:1.6.8")
-    shadowCommon("io.ktor:ktor-client-core:1.6.8") {
+    shadowCommon("io.ktor:ktor-client-websockets:2.3.12")
+    shadowCommon("io.ktor:ktor-client-cio:2.3.12")
+    shadowCommon("io.ktor:ktor-client-core:2.3.12") {
         exclude(group = "org.slf4j")
     }
     shadowCommon("com.alibaba.fastjson2:fastjson2:2.0.52") {

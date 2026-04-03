@@ -1,5 +1,4 @@
 import org.apache.tools.ant.filters.ReplaceTokens
-
 plugins {
     java
     kotlin("jvm")
@@ -79,9 +78,9 @@ dependencies {
     implementation(group = "eu.okaeri", name = "okaeri-configs-yaml-snakeyaml", version = "5.0.13")
     implementation(group = "com.alibaba.fastjson2", name = "fastjson2", version = "2.0.52")
 
-    implementation("io.ktor:ktor-client-websockets:1.6.8")
-    implementation("io.ktor:ktor-client-cio:1.6.8")
-    implementation("io.ktor:ktor-client-core:1.6.8") {
+    implementation("io.ktor:ktor-client-websockets:2.3.12")
+    implementation("io.ktor:ktor-client-cio:2.3.12")
+    implementation("io.ktor:ktor-client-core:2.3.12") {
         exclude(group = "org.slf4j")
         exclude(group = "org.yaml")
     }

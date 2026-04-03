@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.2.0"
+    kotlin("jvm")
     id("com.gradleup.shadow") apply false
 }
 
@@ -11,9 +11,9 @@ java {
 
 
 dependencies {
-    implementation("io.ktor:ktor-client-websockets:1.6.8")
-    implementation("io.ktor:ktor-client-cio:1.6.8")
-    implementation("io.ktor:ktor-client-core:1.6.8") {
+    implementation("io.ktor:ktor-client-websockets:2.3.12")
+    implementation("io.ktor:ktor-client-cio:2.3.12")
+    implementation("io.ktor:ktor-client-core:2.3.12") {
         exclude(group = "org.slf4j")
         exclude(group = "org.yaml")
     }

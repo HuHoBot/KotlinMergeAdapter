@@ -1,11 +1,11 @@
 plugins {
-    kotlin("jvm") version "2.2.0" apply false
+    kotlin("jvm") version "1.9.22" apply false
     id("com.gradleup.shadow") version "9.2.2" apply false
 }
 
 allprojects {
     group = "cn.huohuas001"
-    version = "2.1.0"
+    version = "2.1.1"
 
     repositories {
         mavenCentral()
