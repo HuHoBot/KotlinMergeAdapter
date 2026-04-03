@@ -1,4 +1,4 @@
-# HuHoBot-Adapter v2.1.0
+# HuHoBot-Adapter v2.1.1
 
-feat(bot): 添加文本过滤功能以清理命令响应中的ANSI转义序列
-- 在所有服务器实现中添加filterRegex配置选项
+chore(build): 更新项目依赖版本并修复包导入路径
+- 修复部分服务器由于`Kotlin`依赖问题无法正确运行
