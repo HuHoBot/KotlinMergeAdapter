@@ -15,7 +15,8 @@ class Motd(
     val api:String,
     val text: String,
     val outputOnlineList: Boolean,
-    val postImg: Boolean
+    val postImg: Boolean,
+    val useMarkdown: Boolean
 )
 
 class WhiteList(

@@ -123,7 +123,8 @@ class HuHoBotAllay: Plugin(), HuHoBot {
             config.motd.text,
             config.motd.outputOnlineList,
             config.motd.postImg,
-            )
+            config.motd.markdown,
+        )
     }
 
     override fun getServerId(): String {

@@ -27,25 +27,9 @@ abstract class AbstractQueryOnline : BaseEvent() {
     override fun run(): Boolean {
         val plugin = getPlugin()
         val motd = plugin.getMotd()
-        val sb = StringBuilder()
-
         val playerNames = getOnlinePlayerNames()
-
-        if (motd.outputOnlineList) {
-            if (playerNames.isNotEmpty()) {
-                sb.append("\n在线玩家列表：\n")
-                for (name in playerNames) {
-                    sb.append(name).append("\n")
-                }
-            } else {
-                sb.append("\n当前没有在线玩家\n")
-            }
-        }
-
-        val onlineSize = if (motd.outputOnlineList) playerNames.size else -1
-        sb.append(processText(motd.text.replace("{online}", onlineSize.toString())))
-
-        ClientManager.postMotd(sb.toString(), mPackId)
+        val textTemplate = processText(motd.text)
+        ClientManager.postMotd(playerNames, textTemplate, mPackId)
         return true
     }
 }

@@ -14,6 +14,7 @@ motd:
   text: "共{online}人在线"
   output_online_list: true
   post_img: true
+  markdown: true
 
 whiteList:
   add: "whitelist add {name}"
@@ -34,4 +35,4 @@ customCommand:
 
 CommandSender: "Hybrid"
 
-version: 6
+version: 8

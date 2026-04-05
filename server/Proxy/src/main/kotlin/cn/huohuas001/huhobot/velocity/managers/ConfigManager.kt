@@ -43,6 +43,9 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
                 saveConfig()
             } else {
                 config = loader.load()
+                if (ensureMarkdownConfig()) {
+                    saveConfig()
+                }
             }
         } catch (e: IOException) {
             plugin.logger.error("Failed to load config: ${e.message}")
@@ -67,6 +70,7 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
         config.node("motd", "text").set("共{online}人在线")
         config.node("motd", "output_online_list").set(true)
         config.node("motd", "post_img").set(true)
+        config.node("motd", "markdown").set(true)
 
         config.node("whiteList", "add").set("whitelist add {name}")
         config.node("whiteList", "del").set("whitelist remove {name}")
@@ -81,6 +85,15 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
         config.node("redis", "port").set(6379)
         config.node("redis", "password").set("")
         config.node("redis", "channel").set("HuHoBotChannel")
+    }
+
+    private fun ensureMarkdownConfig(): Boolean {
+        if (config.node("motd", "markdown").virtual()) {
+            config.node("motd", "markdown").set(true)
+            plugin.logger.info("已添加新的配置项: motd.markdown")
+            return true
+        }
+        return false
     }
 
     private fun saveConfig() {
@@ -159,7 +172,8 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
             motd.node("api").getString("")!!,
             motd.node("text").getString("共{online}人在线")!!,
             motd.node("output_online_list").getBoolean(true),
-            motd.node("post_img").getBoolean(true)
+            motd.node("post_img").getBoolean(true),
+            motd.node("markdown").getBoolean(true)
         )
     }
 

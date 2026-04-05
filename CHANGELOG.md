@@ -1,4 +1,5 @@
-# HuHoBot-Adapter v2.1.1
+# HuHoBot-Adapter v2.1.2
 
-chore(build): 更新项目依赖版本并修复包导入路径
-- 修复部分服务器由于`Kotlin`依赖问题无法正确运行
+feat(motd): 添加 Markdown 渲染支持和优化在线玩家列表显示
+- 在配置中添加 useMarkdown 选项以控制 MOTD 渲染方式
+- 优化 ClientManager 中的 MOTD 发送接口，分离玩家名称和文本模板参数

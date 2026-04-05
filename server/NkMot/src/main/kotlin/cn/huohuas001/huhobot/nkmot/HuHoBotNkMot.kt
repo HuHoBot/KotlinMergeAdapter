@@ -101,7 +101,8 @@ class HuHoBotNkMot: PluginBase(), HuHoBot {
             config.motd.api,
             config.motd.text,
             config.motd.outputOnlineList,
-            config.motd.postImg
+            config.motd.postImg,
+            config.motd.useMarkdown
         )
     }
 

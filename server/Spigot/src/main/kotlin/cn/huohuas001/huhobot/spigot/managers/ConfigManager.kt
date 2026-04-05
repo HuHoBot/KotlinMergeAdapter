@@ -4,6 +4,7 @@ import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.provider.CustomCommandDetail
 import cn.huohuas001.bot.tools.getPackID
 import cn.huohuas001.huhobot.spigot.HuHoBotSpigot
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
@@ -16,7 +17,7 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
 
     private val configFile: File = File(plugin.dataFolder, "config.yml")
     private val oldConfigFile: File = File(plugin.dataFolder, "config_old.yml")
-    private val version: Int = 7
+    private val version: Int = 8
 
     init {
         if (checkConfig()) {
@@ -28,31 +29,17 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
     fun checkConfig(): Boolean {
         if (configFile.exists()) {
             val version = if (plugin.config.contains("version")) plugin.config.getInt("version") else -1
-            return this.version > version
+            return this.version > version || !plugin.config.contains("motd.markdown")
         }
         return true
     }
 
-    // 添加从版本5到版本6的迁移方法
-    private fun migrateFromV5ToV6(oldConfig: FileConfiguration, newConfig: FileConfiguration) {
-        // 移除旧的 CommandExecutionSort 配置项
-        if (newConfig.contains("CommandExecutionSort")) {
-            newConfig.set("CommandExecutionSort", null)
-            plugin.pluginLogger.info("已移除过时的配置项: CommandExecutionSort")
-        }
-
-        // 添加新的 CommandSender 配置项，默认值为 Hybrid
-        if (!newConfig.contains("CommandSender")) {
-            newConfig.set("CommandSender", "Hybrid")
-            plugin.pluginLogger.info("已添加新的配置项: CommandSender")
-        }
-    }
-
-    // 添加从版本6到版本7的迁移方法
-    private fun migrateFromV6ToV7(oldConfig: FileConfiguration, newConfig: FileConfiguration) {
-        if (!newConfig.contains("filterRegex")) {
-            newConfig.set("filterRegex", listOf("\\u001B\\[[;\\d]*[ -/]*[@-~]"))
-            plugin.pluginLogger.info("已添加新的配置项: filterRegex")
+    private fun mergeOldConfigIntoNewConfig(oldConfig: FileConfiguration, newConfig: FileConfiguration) {
+        for (path in newConfig.getKeys(true)) {
+            val defaultValue = newConfig.get(path)
+            if (defaultValue !is ConfigurationSection && oldConfig.contains(path)) {
+                newConfig.set(path, oldConfig.get(path))
+            }
         }
     }
 
@@ -74,30 +61,21 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
             if (oldConfigFile.exists()) {
                 val oldConfig = YamlConfiguration.loadConfiguration(oldConfigFile)
                 val oldVersion = if (oldConfig.contains("version")) oldConfig.getInt("version") else -1
+                val hadMarkdown = oldConfig.contains("motd.markdown")
 
-                // 根据旧版本号执行相应的迁移
-                when (oldVersion) {
-                    6 -> {
-                        migrateFromV6ToV7(oldConfig, newConfig)
-                        plugin.pluginLogger.info("配置文件从版本6升级到7")
-                    }
-                    5 -> {
-                        // 从版本5迁移到版本6
-                        migrateFromV5ToV6(oldConfig, newConfig)
-                        migrateFromV6ToV7(oldConfig, newConfig)
-                        plugin.pluginLogger.info("配置文件从版本5升级到7")
-                    }
-                    // 如果还有其他旧版本，可以继续添加
-                    in 0..4 -> {
-                        // 对于更旧的版本，直接使用默认配置
-                        plugin.pluginLogger.warning("检测到较旧的配置版本($oldVersion)，将使用默认配置")
-                    }
-                    else -> {
-                        plugin.pluginLogger.info("未找到需要迁移的配置项")
-                    }
+                mergeOldConfigIntoNewConfig(oldConfig, newConfig)
+                newConfig.set("version", this.version)
+
+                if (!hadMarkdown) {
+                    plugin.pluginLogger.info("已添加新的配置项: motd.markdown")
                 }
 
+                if (this.version > oldVersion) {
+                    plugin.pluginLogger.info("配置文件从版本${oldVersion}升级到${this.version}")
+                }
                 plugin.pluginLogger.info("配置文件迁移完成")
+            } else {
+                newConfig.set("version", this.version)
             }
 
             plugin.saveConfig()

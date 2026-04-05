@@ -46,6 +46,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
                     put("text", "共{online}人在线")
                     put("output_online_list", true)
                     put("post_img", true)
+                    put("markdown", true)
                 })
                 put("customCommand", listOf(
                     ConfigSection().apply {
@@ -77,7 +78,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
         filterRegex = config.getStringList("filterRegex")
         version = config.getInt("version", 0) // 带默认值读取
 
-        if (version < currentVersion) {
+        if (version < currentVersion || !config.exists("motd.markdown")) {
             migrateToV3()
         }
     }
@@ -97,6 +98,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
         val text: String = section.getString("text", "共{online}人在线")
         val outputOnlineList: Boolean = section.getBoolean("output_online_list", true)
         val postImg: Boolean = section.getBoolean("post_img", true)
+        val useMarkdown: Boolean = section.getBoolean("markdown", true)
     }
 
     class CustomCommand(section: ConfigSection) {
@@ -140,6 +142,9 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
     // 新增迁移方法
     private fun migrateToV3() {
         this.callbackConvertImg = 0
+        if (!config.exists("motd.markdown")) {
+            config.set("motd.markdown", true)
+        }
 
         // 更新版本号
         config.set("version", 3)

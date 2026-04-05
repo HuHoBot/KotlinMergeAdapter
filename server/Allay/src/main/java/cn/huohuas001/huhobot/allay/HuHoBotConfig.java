@@ -191,6 +191,10 @@ public class HuHoBotConfig extends OkaeriConfig {
         @Comment("是否发布状态图片")
         @CustomKey("post_img")
         public boolean postImg = true;
+
+        @Comment("是否使用 Markdown 渲染 MOTD")
+        @CustomKey("markdown")
+        public boolean markdown = true;
     }
 
     @Getter

@@ -140,7 +140,8 @@ class HuHoBotSpigot: JavaPlugin(),HuHoBot {
         val text = config.getString("motd.text")!!
         val outputOnlineList = config.getBoolean("motd.output_online_list")
         val postImg = config.getBoolean("motd.post_img")
-        return Motd(serverIP, serverPort, api, text, outputOnlineList, postImg)
+        val useMarkdown = config.getBoolean("motd.markdown", true)
+        return Motd(serverIP, serverPort, api, text, outputOnlineList, postImg, useMarkdown)
     }
 
     override fun addWhiteList(playerName: String) {

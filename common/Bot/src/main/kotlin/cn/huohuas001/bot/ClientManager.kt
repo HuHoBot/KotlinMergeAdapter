@@ -6,6 +6,7 @@ import cn.huohuas001.config.WS_SERVER_URL
 import com.alibaba.fastjson2.JSONObject
 import java.net.URI
 import java.net.URISyntaxException
+import kotlin.text.append
 
 object ClientManager {
     private var client: WsClient? = null
@@ -117,19 +118,52 @@ object ClientManager {
         }
     }
 
-    fun postMotd(msg: String,packId: String){
+    private fun motdMsgBuilder(playerNames: List<String>,textTemplate: String): String {
+        val plugin = BotShared.getPlugin()
+        val motd = plugin.getMotd()
+        val useMarkdown = motd.useMarkdown
+
+        if(useMarkdown){
+            return playerNames.joinToString(", ")
+        }else{
+            val sb = StringBuilder()
+            if (motd.outputOnlineList) {
+                if (playerNames.isNotEmpty()) {
+                    sb.append("\n在线玩家列表：\n")
+                    for (name in playerNames) {
+                        sb.append(name).append("\n")
+                    }
+                } else {
+                    sb.append("\n当前没有在线玩家\n")
+                }
+            }
+
+            val onlineSize = if (motd.outputOnlineList) playerNames.size else -1
+            sb.append(textTemplate.replace("{online}", onlineSize.toString()))
+            return sb.toString()
+        }
+    }
+
+    fun postMotd(playerNames: List<String>,textTemplate: String, packId: String){
         val plugin = BotShared.getPlugin()
         val serverIP: String = plugin.getMotd().serverIP
         val serverPort: Int = plugin.getMotd().serverPort
         val api: String = plugin.getMotd().api
         val postImg = plugin.getMotd().postImg
+        val useMarkdown = plugin.getMotd().useMarkdown
         // 构造JSON对象
         val list = JSONObject()
+        val msg = motdMsgBuilder(playerNames,textTemplate)
         list["msg"] = msg
         list["url"] = "$serverIP:$serverPort"
         list["imgUrl"] = api.replace("{server_ip}", serverIP).replace("{server_port}", serverPort.toString())
         list["post_img"] = postImg
         list["serverType"] = "java"
+        list["useMarkdown"] = useMarkdown
+        list["serverName"] = plugin.getName()
+        list["currentOnline"] = playerNames.size.toString()
+
+        //封包
         val rBody = JSONObject()
         rBody["list"] = list
 

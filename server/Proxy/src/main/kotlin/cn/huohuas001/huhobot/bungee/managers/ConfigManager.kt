@@ -35,6 +35,9 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
                 saveConfig()
             } else {
                 config = ConfigurationProvider.getProvider(YamlConfiguration::class.java).load(configFile)
+                if (ensureMarkdownConfig()) {
+                    saveConfig()
+                }
             }
         } catch (e: IOException) {
             plugin.logger.severe("Failed to load config: ${e.message}")
@@ -59,6 +62,7 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
         defaultConfig.set("motd.text", "共{online}人在线")
         defaultConfig.set("motd.output_online_list", true)
         defaultConfig.set("motd.post_img", true)
+        defaultConfig.set("motd.markdown", true)
 
         defaultConfig.set("whiteList.add", "whitelist add {name}")
         defaultConfig.set("whiteList.del", "whitelist remove {name}")
@@ -75,6 +79,15 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
         defaultConfig.set("redis.channel", "HuHoBotChannel")
 
         return defaultConfig
+    }
+
+    private fun ensureMarkdownConfig(): Boolean {
+        if (!config.contains("motd.markdown")) {
+            config.set("motd.markdown", true)
+            plugin.logger.info("已添加新的配置项: motd.markdown")
+            return true
+        }
+        return false
     }
 
     private fun saveConfig() {
@@ -151,7 +164,8 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
             config.getString("motd.api", ""),
             config.getString("motd.text", "共{online}人在线"),
             config.getBoolean("motd.output_online_list", true),
-            config.getBoolean("motd.post_img", true)
+            config.getBoolean("motd.post_img", true),
+            config.getBoolean("motd.markdown", true)
         )
     }
 
