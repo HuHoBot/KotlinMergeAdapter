@@ -71,6 +71,7 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
         config.node("motd", "output_online_list").set(true)
         config.node("motd", "post_img").set(true)
         config.node("motd", "markdown").set(true)
+        config.node("motd", "customMarkdown").set(false)
 
         config.node("whiteList", "add").set("whitelist add {name}")
         config.node("whiteList", "del").set("whitelist remove {name}")
@@ -88,12 +89,18 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
     }
 
     private fun ensureMarkdownConfig(): Boolean {
+        var changed = false
         if (config.node("motd", "markdown").virtual()) {
             config.node("motd", "markdown").set(true)
             plugin.logger.info("已添加新的配置项: motd.markdown")
-            return true
+            changed = true
         }
-        return false
+        if (config.node("motd", "customMarkdown").virtual()) {
+            config.node("motd", "customMarkdown").set(false)
+            plugin.logger.info("已添加新的配置项: motd.customMarkdown")
+            changed = true
+        }
+        return changed
     }
 
     private fun saveConfig() {
@@ -173,7 +180,8 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
             motd.node("text").getString("共{online}人在线")!!,
             motd.node("output_online_list").getBoolean(true),
             motd.node("post_img").getBoolean(true),
-            motd.node("markdown").getBoolean(true)
+            motd.node("markdown").getBoolean(true),
+            motd.node("customMarkdown").getBoolean(false)
         )
     }
 

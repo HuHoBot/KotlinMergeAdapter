@@ -109,6 +109,8 @@ motd:
   text: "共{online}人在线" #使用"/查在线"时的Motd文本，可使用PlaceholderAPI，留空不显示
   output_online_list: true #是否显示在线列表
   post_img: true #是否显示Motd图片
+  markdown: true #是否使用Markdown渲染Motd
+  customMarkdown: false #是否额外发送与配置文件同目录下online.md的自定义Markdown内容
 
 whiteList: #Allay与Nukkit无该配置项
   add: "whitelist add {name}" #添加白名单的指令

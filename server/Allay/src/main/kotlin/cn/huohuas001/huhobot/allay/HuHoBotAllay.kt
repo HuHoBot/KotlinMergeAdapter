@@ -23,6 +23,7 @@ import org.allaymc.api.eventbus.event.player.PlayerChatEvent
 import org.allaymc.api.plugin.Plugin
 import org.allaymc.api.registry.Registries
 import org.allaymc.api.server.Server
+import java.io.File
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 
@@ -124,7 +125,12 @@ class HuHoBotAllay: Plugin(), HuHoBot {
             config.motd.outputOnlineList,
             config.motd.postImg,
             config.motd.markdown,
+            config.motd.customMarkdown,
         )
+    }
+
+    override fun getConfigFile(): File {
+        return Path.of(CONFIG_FILE_NAME).toFile()
     }
 
     override fun getServerId(): String {

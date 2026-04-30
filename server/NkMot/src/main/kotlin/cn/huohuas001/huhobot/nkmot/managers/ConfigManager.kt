@@ -9,7 +9,7 @@ import java.io.File
 
 class ConfigManager(private val plugin: HuHoBotNkMot) {
     private val config: Config
-    private val currentVersion = 3
+    private val currentVersion = 4
 
     // 根配置项
     private var serverId: String
@@ -47,6 +47,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
                     put("output_online_list", true)
                     put("post_img", true)
                     put("markdown", true)
+                    put("customMarkdown", false)
                 })
                 put("customCommand", listOf(
                     ConfigSection().apply {
@@ -78,8 +79,8 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
         filterRegex = config.getStringList("filterRegex")
         version = config.getInt("version", 0) // 带默认值读取
 
-        if (version < currentVersion || !config.exists("motd.markdown")) {
-            migrateToV3()
+        if (version < currentVersion || !config.exists("motd.markdown") || !config.exists("motd.customMarkdown")) {
+            migrateToV4()
         }
     }
 
@@ -99,6 +100,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
         val outputOnlineList: Boolean = section.getBoolean("output_online_list", true)
         val postImg: Boolean = section.getBoolean("post_img", true)
         val useMarkdown: Boolean = section.getBoolean("markdown", true)
+        val customMarkdown: Boolean = section.getBoolean("customMarkdown", false)
     }
 
     class CustomCommand(section: ConfigSection) {
@@ -140,16 +142,22 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
     }
 
     // 新增迁移方法
-    private fun migrateToV3() {
-        this.callbackConvertImg = 0
+    private fun migrateToV4() {
+        if (version < 3) {
+            this.callbackConvertImg = 0
+        }
         if (!config.exists("motd.markdown")) {
             config.set("motd.markdown", true)
         }
 
+        if (!config.exists("motd.customMarkdown")) {
+            config.set("motd.customMarkdown", false)
+        }
+
         // 更新版本号
-        config.set("version", 3)
+        config.set("version", 4)
         config.save() // 立即保存迁移结果
 
-        version = 3 // 更新内存中的版本号
+        version = 4 // 更新内存中的版本号
     }
 }

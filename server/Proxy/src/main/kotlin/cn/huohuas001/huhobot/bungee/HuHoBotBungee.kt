@@ -17,6 +17,7 @@ import cn.huohuas001.huhobot.common.redis.RedisManager
 import com.alibaba.fastjson2.JSONObject
 import net.md_5.bungee.api.chat.TextComponent
 import net.md_5.bungee.api.plugin.Plugin
+import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
@@ -129,6 +130,10 @@ class HuHoBotBungee : Plugin(), HuHoBotProxy {
 
     override fun getMotd(): Motd {
         return configManager.getMotd()
+    }
+
+    override fun getConfigFile(): File {
+        return File(dataFolder, "config.yml")
     }
 
     override fun addWhiteList(playerName: String) {

@@ -18,6 +18,7 @@ import com.github.Anon8281.universalScheduler.UniversalScheduler
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
+import java.io.File
 import java.util.Locale
 import java.util.concurrent.CompletableFuture
 import java.util.logging.Logger
@@ -141,7 +142,12 @@ class HuHoBotSpigot: JavaPlugin(),HuHoBot {
         val outputOnlineList = config.getBoolean("motd.output_online_list")
         val postImg = config.getBoolean("motd.post_img")
         val useMarkdown = config.getBoolean("motd.markdown", true)
-        return Motd(serverIP, serverPort, api, text, outputOnlineList, postImg, useMarkdown)
+        val customMarkdown = config.getBoolean("motd.customMarkdown", false)
+        return Motd(serverIP, serverPort, api, text, outputOnlineList, postImg, useMarkdown, customMarkdown)
+    }
+
+    override fun getConfigFile(): File {
+        return File(dataFolder, "config.yml")
     }
 
     override fun addWhiteList(playerName: String) {

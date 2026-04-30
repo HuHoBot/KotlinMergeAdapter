@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("ALL")
 public class HuHoBotConfig extends OkaeriConfig {
     @Exclude
-    private static final int CURRENT_VERSION = 3;
+    private static final int CURRENT_VERSION = 4;
 
     // region Getters & Setters
     // region 核心配置
@@ -89,7 +89,7 @@ public class HuHoBotConfig extends OkaeriConfig {
     // 在PluginConfig类顶部添加版本字段
     @Comment("配置版本")
     @CustomKey("version")
-    private int configVersion = 2;
+    private int configVersion = 3;
     // endregion
 
     // 废弃原有motdUrl字段
@@ -121,6 +121,8 @@ public class HuHoBotConfig extends OkaeriConfig {
     }
 
     private void performConfigMigration() {
+        int oldVersion = this.configVersion;
+
         // 如果存在旧版 motdUrl 配置
         if (this.motdUrl != null && !this.motdUrl.isEmpty()) {
             String[] parts = this.motdUrl.split(":");
@@ -140,10 +142,12 @@ public class HuHoBotConfig extends OkaeriConfig {
         }
         this.chatFormatGroup = null; // 清除旧字段
 
-        this.callbackConvertImg = 0;
+        if (oldVersion < 3) {
+            this.callbackConvertImg = 0;
+        }
 
 
-        this.configVersion = 3; // 更新版本号
+        this.configVersion = CURRENT_VERSION; // 更新版本号
     }
     // endregion
 
@@ -195,6 +199,9 @@ public class HuHoBotConfig extends OkaeriConfig {
         @Comment("是否使用 Markdown 渲染 MOTD")
         @CustomKey("markdown")
         public boolean markdown = true;
+
+        @Comment("是否发送 online.md 中的自定义 Markdown 字符串")
+        public boolean customMarkdown = false;
     }
 
     @Getter

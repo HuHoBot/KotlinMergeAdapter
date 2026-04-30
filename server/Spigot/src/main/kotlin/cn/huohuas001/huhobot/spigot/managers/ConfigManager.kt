@@ -17,7 +17,7 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
 
     private val configFile: File = File(plugin.dataFolder, "config.yml")
     private val oldConfigFile: File = File(plugin.dataFolder, "config_old.yml")
-    private val version: Int = 8
+    private val version: Int = 9
 
     init {
         if (checkConfig()) {
@@ -29,7 +29,9 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
     fun checkConfig(): Boolean {
         if (configFile.exists()) {
             val version = if (plugin.config.contains("version")) plugin.config.getInt("version") else -1
-            return this.version > version || !plugin.config.contains("motd.markdown")
+            return this.version > version ||
+                    !plugin.config.contains("motd.markdown") ||
+                    !plugin.config.contains("motd.customMarkdown")
         }
         return true
     }
@@ -62,12 +64,17 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
                 val oldConfig = YamlConfiguration.loadConfiguration(oldConfigFile)
                 val oldVersion = if (oldConfig.contains("version")) oldConfig.getInt("version") else -1
                 val hadMarkdown = oldConfig.contains("motd.markdown")
+                val hadCustomMarkdown = oldConfig.contains("motd.customMarkdown")
 
                 mergeOldConfigIntoNewConfig(oldConfig, newConfig)
                 newConfig.set("version", this.version)
 
                 if (!hadMarkdown) {
                     plugin.pluginLogger.info("已添加新的配置项: motd.markdown")
+                }
+
+                if (!hadCustomMarkdown) {
+                    plugin.pluginLogger.info("已添加新的配置项: motd.customMarkdown")
                 }
 
                 if (this.version > oldVersion) {

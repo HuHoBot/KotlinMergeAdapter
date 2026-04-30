@@ -15,6 +15,7 @@ motd:
   output_online_list: true
   post_img: true
   markdown: true
+  customMarkdown: false
 
 whiteList:
   add: "whitelist add {name}"
@@ -35,4 +36,4 @@ customCommand:
 
 CommandSender: "Hybrid"
 
-version: 8
+version: 9

@@ -25,6 +25,7 @@ import com.velocitypowered.api.plugin.PluginContainer
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import org.slf4j.Logger
+import java.io.File
 import java.nio.file.Path
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
@@ -154,6 +155,10 @@ class HuHoBotVelocity @Inject constructor(
 
     override fun getMotd(): Motd {
         return configManager.getMotd()
+    }
+
+    override fun getConfigFile(): File {
+        return dataDirectory.resolve("config.yml").toFile()
     }
 
     override fun addWhiteList(playerName: String) {

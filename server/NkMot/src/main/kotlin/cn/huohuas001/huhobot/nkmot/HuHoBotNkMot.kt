@@ -19,6 +19,7 @@ import cn.huohuas001.huhobot.nkmot.managers.ConfigManager
 import cn.huohuas001.huhobot.nkmot.tools.ConsoleSender
 import cn.nukkit.plugin.PluginBase
 import cn.nukkit.plugin.PluginLogger
+import java.io.File
 import java.util.concurrent.CompletableFuture
 
 class HuHoBotNkMot: PluginBase(), HuHoBot {
@@ -102,8 +103,13 @@ class HuHoBotNkMot: PluginBase(), HuHoBot {
             config.motd.text,
             config.motd.outputOnlineList,
             config.motd.postImg,
-            config.motd.useMarkdown
+            config.motd.useMarkdown,
+            config.motd.customMarkdown
         )
+    }
+
+    override fun getConfigFile(): File {
+        return File(dataFolder, "config.yml")
     }
 
     override fun getServerId(): String {

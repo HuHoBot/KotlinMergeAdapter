@@ -1,6 +1,7 @@
 package cn.huohuas001.bot.provider
 
 import cn.huohuas001.bot.tools.filterTextByRegex
+import java.io.File
 
 class ChatFormat(
     val fromGame: String,
@@ -16,7 +17,8 @@ class Motd(
     val text: String,
     val outputOnlineList: Boolean,
     val postImg: Boolean,
-    val useMarkdown: Boolean
+    val useMarkdown: Boolean,
+    val customMarkdown: Boolean
 )
 
 class WhiteList(
@@ -33,6 +35,10 @@ class CustomCommandDetail(
 interface ConfigProvider {
     fun getChatFormat(): ChatFormat
     fun getMotd(): Motd
+    fun getConfigFile(): File? {
+        return null
+    }
+
     fun getFilterRegexList(): List<String> {
         return emptyList()
     }

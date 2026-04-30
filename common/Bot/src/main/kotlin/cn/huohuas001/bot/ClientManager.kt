@@ -146,11 +146,12 @@ object ClientManager {
 
     fun postMotd(playerNames: List<String>,textTemplate: String, packId: String){
         val plugin = BotShared.getPlugin()
-        val serverIP: String = plugin.getMotd().serverIP
-        val serverPort: Int = plugin.getMotd().serverPort
-        val api: String = plugin.getMotd().api
-        val postImg = plugin.getMotd().postImg
-        val useMarkdown = plugin.getMotd().useMarkdown
+        val motd = plugin.getMotd()
+        val serverIP: String = motd.serverIP
+        val serverPort: Int = motd.serverPort
+        val api: String = motd.api
+        val postImg = motd.postImg
+        val useMarkdown = motd.useMarkdown
         // 构造JSON对象
         val list = JSONObject()
         val msg = motdMsgBuilder(playerNames,textTemplate)
@@ -162,6 +163,9 @@ object ClientManager {
         list["useMarkdown"] = useMarkdown
         list["serverName"] = plugin.getName()
         list["currentOnline"] = playerNames.size.toString()
+        if (motd.customMarkdown) {
+            list["customMarkdown"] = readOnlineMarkdown()
+        }
 
         //封包
         val rBody = JSONObject()
@@ -169,6 +173,19 @@ object ClientManager {
 
         //返回消息
         client?.sendMessage("queryOnline", rBody, packId)
+    }
+
+    private fun readOnlineMarkdown(): String {
+        val plugin = BotShared.getPlugin()
+        val markdownFile = plugin.getConfigFile()?.parentFile?.resolve("online.md")
+        if (markdownFile == null || !markdownFile.isFile) {
+            plugin.log_warning("未找到 online.md 文件, 请检查文件是否存在. 若需自定义, 请新建该文件在config同级目录下.")
+            return ""
+        }
+
+        return runCatching { markdownFile.readText(Charsets.UTF_8) }
+            .onFailure { plugin.log_warning("读取 online.md 失败: ${it.message}") }
+            .getOrDefault("")
     }
 
     fun postList(list:String,packId: String){
