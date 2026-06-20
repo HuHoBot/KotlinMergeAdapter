@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("ALL")
 public class HuHoBotConfig extends OkaeriConfig {
     @Exclude
-    private static final int CURRENT_VERSION = 4;
+    private static final int CURRENT_VERSION = 5;
 
     // region Getters & Setters
     // region 核心配置
@@ -146,6 +146,13 @@ public class HuHoBotConfig extends OkaeriConfig {
             this.callbackConvertImg = 0;
         }
 
+        if (oldVersion < 5) {
+            if (this.postEvent == null) {
+                this.postEvent = new PostEventConfig();
+                this.postEvent.onJoin = new PostEventEntry(false, "玩家 {playerName} 加入了服务器");
+                this.postEvent.onLeft = new PostEventEntry(false, "玩家 {playerName} 离开了服务器");
+            }
+        }
 
         this.configVersion = CURRENT_VERSION; // 更新版本号
     }
@@ -202,6 +209,50 @@ public class HuHoBotConfig extends OkaeriConfig {
 
         @Comment("是否发送 online.md 中的自定义 Markdown 字符串")
         public boolean customMarkdown = false;
+    }
+
+    @Getter
+    @Comment({
+            "玩家进出服务器事件推送配置",
+            "onJoin: 玩家加入事件",
+            "onLeft: 玩家离开事件"
+    })
+    public PostEventConfig postEvent = new PostEventConfig();
+
+    @Getter
+    public static class PostEventConfig extends OkaeriConfig {
+        @Comment("玩家加入事件")
+        @CustomKey("onJoin")
+        public PostEventEntry onJoin = new PostEventEntry(
+                false,
+                "玩家 {playerName} 加入了服务器"
+        );
+
+        @Comment("玩家离开事件")
+        @CustomKey("onLeft")
+        public PostEventEntry onLeft = new PostEventEntry(
+                false,
+                "玩家 {playerName} 离开了服务器"
+        );
+    }
+
+    @Getter
+    public static class PostEventEntry extends OkaeriConfig {
+        @Comment("是否启用")
+        public boolean enable;
+
+        @Comment("格式化字符串，可用变量: {playerName}")
+        public String formatString;
+
+        public PostEventEntry() {
+            this.enable = false;
+            this.formatString = "";
+        }
+
+        public PostEventEntry(boolean enable, String formatString) {
+            this.enable = enable;
+            this.formatString = formatString;
+        }
     }
 
     @Getter

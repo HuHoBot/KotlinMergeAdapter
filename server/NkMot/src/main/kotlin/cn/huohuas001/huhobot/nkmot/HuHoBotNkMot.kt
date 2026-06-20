@@ -13,6 +13,7 @@ import cn.huohuas001.bot.provider.HExecution
 import cn.huohuas001.bot.tools.Cancelable
 import cn.huohuas001.bot.tools.getPackID
 import cn.huohuas001.huhobot.nkmot.commands.HuHoBotCommand
+import cn.huohuas001.huhobot.nkmot.events.PlayerEvents
 import cn.huohuas001.huhobot.nkmot.events.QueryOnline
 import cn.huohuas001.huhobot.nkmot.events.QueryWhiteList
 import cn.huohuas001.huhobot.nkmot.managers.ConfigManager
@@ -50,6 +51,10 @@ class HuHoBotNkMot: PluginBase(), HuHoBot {
 
     override fun onEnable() {
         enableBot()
+
+        //注册事件监听器
+        this.server.pluginManager.registerEvents(PlayerEvents(this), this)
+
         pluginLogger.info("HuHoBot Loaded. By HuoHuas001")
     }
 
@@ -121,7 +126,12 @@ class HuHoBotNkMot: PluginBase(), HuHoBot {
     }
 
     override fun getHashKey(): String? {
-        return config.hashKey
+        var hashKey = config.hashKey
+        return if (hashKey.isEmpty() || hashKey === "null") {
+            null
+        } else {
+            hashKey
+        }
     }
 
     override fun setHashKey(hashKey: String) {

@@ -6,6 +6,7 @@ import cn.huohuas001.config.WS_SERVER_URL
 import com.alibaba.fastjson2.JSONObject
 import java.net.URI
 import java.net.URISyntaxException
+import kotlin.collections.set
 import kotlin.text.append
 
 object ClientManager {
@@ -116,6 +117,15 @@ object ClientManager {
             body["msg"] = formatted
             client?.sendMessage("chat", body)
         }
+    }
+
+    fun postCustomChat(formatString: String,msgType: String="聊天"){
+        val plugin = BotShared.getPlugin()
+        val body = JSONObject()
+        body["serverId"] = plugin.getServerId()
+        body["msg"] = formatString
+        body["msgType"] = msgType
+        client?.sendMessage("chat", body)
     }
 
     private fun motdMsgBuilder(playerNames: List<String>,textTemplate: String): String {

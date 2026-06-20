@@ -8,6 +8,7 @@ import cn.huohuas001.bot.tools.Cancelable
 import cn.huohuas001.huhobot.bungee.commands.BungeeConsoleSender
 import cn.huohuas001.huhobot.bungee.commands.HuHoBotCommand
 import cn.huohuas001.huhobot.bungee.events.GameChat
+import cn.huohuas001.huhobot.bungee.events.PlayerEvents
 import cn.huohuas001.huhobot.bungee.events.QueryAllowList
 import cn.huohuas001.huhobot.bungee.events.QueryOnline
 import cn.huohuas001.huhobot.bungee.managers.ConfigManager
@@ -40,6 +41,7 @@ class HuHoBotBungee : Plugin(), HuHoBotProxy {
 
         // Register chat event listener
         proxy.pluginManager.registerListener(this, GameChat(this))
+        proxy.pluginManager.registerListener(this, PlayerEvents(this))
 
         enableBot()
     }

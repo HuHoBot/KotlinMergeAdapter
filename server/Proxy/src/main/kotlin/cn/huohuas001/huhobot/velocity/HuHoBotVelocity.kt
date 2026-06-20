@@ -10,6 +10,7 @@ import cn.huohuas001.huhobot.common.HuHoBotProxy
 import cn.huohuas001.huhobot.velocity.commands.HuHoBotCommand
 import cn.huohuas001.huhobot.velocity.commands.VelocityConsoleSender
 import cn.huohuas001.huhobot.velocity.events.GameChat
+import cn.huohuas001.huhobot.velocity.events.PlayerEvents
 import cn.huohuas001.huhobot.velocity.events.QueryAllowList
 import cn.huohuas001.huhobot.velocity.events.QueryOnline
 import cn.huohuas001.huhobot.common.managers.IConfigManager
@@ -58,6 +59,8 @@ class HuHoBotVelocity @Inject constructor(
 
         // Register chat event listener
         server.eventManager.register(this, GameChat(this))
+
+        server.eventManager.register(this, PlayerEvents(this))
 
         enableBot()
     }

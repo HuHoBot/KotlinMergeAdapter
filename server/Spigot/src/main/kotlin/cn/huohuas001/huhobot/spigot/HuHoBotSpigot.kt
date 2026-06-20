@@ -9,6 +9,7 @@ import cn.huohuas001.huhobot.spigot.api.BotCustomCommand
 import cn.huohuas001.huhobot.spigot.commands.BukkitConsoleSender
 import cn.huohuas001.huhobot.spigot.commands.HybridCommandExecutor
 import cn.huohuas001.huhobot.spigot.events.GameChat
+import cn.huohuas001.huhobot.spigot.events.PlayerEvents
 import cn.huohuas001.huhobot.spigot.events.QueryAllowList
 import cn.huohuas001.huhobot.spigot.events.QueryOnline
 import cn.huohuas001.huhobot.spigot.manager.CommandManager
@@ -47,6 +48,7 @@ class HuHoBotSpigot: JavaPlugin(),HuHoBot {
         this.getCommand("huhobot")!!.setExecutor(CommandManager(this))
 
         server.pluginManager.registerEvents(GameChat(), this)
+        server.pluginManager.registerEvents(PlayerEvents(this), this)
 
         enableBot()
     }

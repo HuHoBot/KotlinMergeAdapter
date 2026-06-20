@@ -69,6 +69,11 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
         defaultConfig.set("whiteList.del", "whitelist remove {name}")
 
         defaultConfig.set("callbackConvertImg", 0)
+        defaultConfig.set("postEvent.onJoin.enable", false)
+        defaultConfig.set("postEvent.onJoin.formatString", "玩家 {playerName} 加入了服务器")
+        defaultConfig.set("postEvent.onLeft.enable", false)
+        defaultConfig.set("postEvent.onLeft.formatString", "玩家 {playerName} 离开了服务器")
+
         defaultConfig.set("filterRegex", listOf("\\u001B\\[[;\\d]*[ -/]*[@-~]"))
         defaultConfig.set("customCommand", emptyList<Any>())
 
@@ -211,5 +216,13 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
 
     override fun getRedisChannel(): String {
         return config.getString("redis.channel", "HuHoBotChannel")
+    }
+
+    override fun getPostEventEnable(eventType: String): Boolean {
+        return config.getBoolean("postEvent.$eventType.enable", false)
+    }
+
+    override fun getPostEventFormat(eventType: String): String {
+        return config.getString("postEvent.$eventType.formatString", "")
     }
 }

@@ -24,4 +24,8 @@ interface IConfigManager {
     fun getRedisPort(): Int
     fun getRedisPassword(): String?
     fun getRedisChannel(): String
+
+    // Post events
+    fun getPostEventEnable(eventType: String): Boolean
+    fun getPostEventFormat(eventType: String): String
 }

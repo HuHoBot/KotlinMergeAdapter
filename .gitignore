@@ -5,6 +5,7 @@ build/
 !**/src/test/**/build/
 
 .claude/
+.deepseek/
 
 **/**/debug*
 

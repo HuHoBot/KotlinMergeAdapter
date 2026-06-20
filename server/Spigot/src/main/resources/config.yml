@@ -36,4 +36,12 @@ customCommand:
 
 CommandSender: "Hybrid"
 
-version: 9
+postEvent:
+  onJoin:
+    enable: false
+    formatString: "玩家 {playerName} 加入了服务器"
+  onLeft:
+    enable: false
+    formatString: "玩家 {playerName} 离开了服务器"
+
+version: 10

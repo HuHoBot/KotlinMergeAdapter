@@ -77,6 +77,11 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
         config.node("whiteList", "del").set("whitelist remove {name}")
 
         config.node("callbackConvertImg").set(0)
+        config.node("postEvent", "onJoin", "enable").set(false)
+        config.node("postEvent", "onJoin", "formatString").set("玩家 {playerName} 加入了服务器")
+        config.node("postEvent", "onLeft", "enable").set(false)
+        config.node("postEvent", "onLeft", "formatString").set("玩家 {playerName} 离开了服务器")
+
         config.node("filterRegex").setList(String::class.java, listOf("\\u001B\\[[;\\d]*[ -/]*[@-~]"))
         config.node("customCommand").setList(Map::class.java, emptyList())
 
@@ -221,4 +226,13 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
     override fun getRedisChannel(): String {
         return config.node("redis", "channel").getString("HuHoBotChannel")!!
     }
+
+    override fun getPostEventEnable(eventType: String): Boolean {
+        return config.node("postEvent", eventType, "enable").getBoolean(false)
+    }
+
+    override fun getPostEventFormat(eventType: String): String {
+        return config.node("postEvent", eventType, "formatString").getString("") ?: ""
+    }
+
 }

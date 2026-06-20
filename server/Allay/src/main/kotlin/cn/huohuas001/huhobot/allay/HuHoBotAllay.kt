@@ -20,6 +20,8 @@ import eu.okaeri.configs.OkaeriConfigInitializer
 import eu.okaeri.configs.yaml.snakeyaml.YamlSnakeYamlConfigurer
 import org.allaymc.api.eventbus.EventHandler
 import org.allaymc.api.eventbus.event.player.PlayerChatEvent
+import org.allaymc.api.eventbus.event.server.PlayerJoinEvent
+import org.allaymc.api.eventbus.event.server.PlayerQuitEvent
 import org.allaymc.api.plugin.Plugin
 import org.allaymc.api.registry.Registries
 import org.allaymc.api.server.Server
@@ -85,6 +87,28 @@ class HuHoBotAllay: Plugin(), HuHoBot {
         val playerName = event.getPlayer().displayName
 
         ClientManager.postChat(playerName,message)
+    }
+
+    @EventHandler
+    private fun onPlayerJoin(event: PlayerJoinEvent) {
+        val playerName = event.player.originName
+        val postEvent = config.postEvent
+
+        if (postEvent.onJoin.enable) {
+            val msg = postEvent.onJoin.formatString.replace("{playerName}", playerName)
+            ClientManager.postCustomChat(msg,"进服")
+        }
+    }
+
+    @EventHandler
+    private fun onPlayerQuit(event: PlayerQuitEvent) {
+        val playerName = event.player.originName
+        val postEvent = config.postEvent
+
+        if (postEvent.onLeft.enable) {
+            val msg = postEvent.onLeft.formatString.replace("{playerName}", playerName)
+            ClientManager.postCustomChat(msg,"退服")
+        }
     }
 
     override fun getQueryAllowList(): BaseEvent {
