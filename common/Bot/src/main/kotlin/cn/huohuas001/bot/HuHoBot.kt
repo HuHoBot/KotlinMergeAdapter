@@ -5,6 +5,7 @@ import cn.huohuas001.bot.events.allowlist.AddAllowList
 import cn.huohuas001.bot.events.allowlist.DelAllowList
 import cn.huohuas001.bot.events.custom_run.CustomRun
 import cn.huohuas001.bot.events.custom_run.CustomRunAdmin
+import cn.huohuas001.bot.events.member.MemberAdd
 import cn.huohuas001.bot.provider.*
 import cn.huohuas001.bot.tools.filterTextByRegex
 import com.alibaba.fastjson2.JSONObject
@@ -57,6 +58,7 @@ interface HuHoBot: LoggerProvider, ConfigProvider, CommandProvider, SchedulerPro
         registerEvent("shutdown", ShutDown())
         registerEvent("run", CustomRun())
         registerEvent("runAdmin", CustomRunAdmin())
+        registerEvent("groupMember", MemberAdd())
         registerEvent("heart", Heart())
         bindRequestObj = BindRequest()
         registerEvent("bindRequest", bindRequestObj)
