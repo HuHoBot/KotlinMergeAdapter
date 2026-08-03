@@ -59,7 +59,7 @@ interface ConfigProvider {
 
     fun isHashKeyValue(): Boolean{
         val hashKey: String? = getHashKey()
-        return hashKey != null && !hashKey.isEmpty()
+        return !hashKey.isNullOrEmpty()
     }
 
     fun loadCustomCommand()

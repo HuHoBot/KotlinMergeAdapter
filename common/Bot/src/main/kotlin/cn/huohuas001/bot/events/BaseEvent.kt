@@ -1,7 +1,6 @@
 package cn.huohuas001.bot.events
 
 import cn.huohuas001.bot.ClientManager
-import cn.huohuas001.bot.HuHoBot
 import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.WsClient
 import com.alibaba.fastjson2.JSONObject

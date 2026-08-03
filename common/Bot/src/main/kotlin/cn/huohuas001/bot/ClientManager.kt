@@ -7,7 +7,7 @@ import com.alibaba.fastjson2.JSONObject
 import java.net.URI
 import java.net.URISyntaxException
 import kotlin.collections.set
-import kotlin.text.append
+
 
 object ClientManager {
     private var client: WsClient? = null
@@ -87,7 +87,7 @@ object ClientManager {
                 }
                 return true
             } catch (e: URISyntaxException) {
-                plugin.log_error(e.stackTrace.toString())
+                plugin.log_error(e.stackTrace.contentToString())
             }
             return false
         }
@@ -98,7 +98,6 @@ object ClientManager {
     }
 
     fun postHeart() {
-        val plugin = BotShared.getPlugin()
         client?.sendMessage("heart", JSONObject())
     }
 
@@ -198,10 +197,10 @@ object ClientManager {
             .getOrDefault("")
     }
 
-    fun postList(list:String,packId: String){
-        val rBody = JSONObject();
-        rBody["list"] = list;
-        client?.sendMessage("queryWl", rBody, packId);
+    fun postList(list:String,packId: String) {
+        val rBody = JSONObject()
+        rBody["list"] = list
+        client?.sendMessage("queryWl", rBody, packId)
     }
 
     fun postRespone(msg: String,type: String,packId: String){

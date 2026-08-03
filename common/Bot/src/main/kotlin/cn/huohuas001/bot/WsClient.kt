@@ -1,12 +1,10 @@
 package cn.huohuas001.bot
 
-import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.tools.getPackID
 import com.alibaba.fastjson2.JSON
 import com.alibaba.fastjson2.JSONObject
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
-import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 import io.ktor.websocket.CloseReason
