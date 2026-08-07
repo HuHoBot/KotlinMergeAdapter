@@ -1,5 +1,4 @@
-# HuHoBot-Adapter v2.1.5
+# HuHoBot-Adapter v2.1.6
 
-feat(core): 添加群成员进退群事件
+feat(core): 添加自定义连接服务器地址
 
-- 在 BotCustomCommand事件中内置了群成员进退群事件处理器
