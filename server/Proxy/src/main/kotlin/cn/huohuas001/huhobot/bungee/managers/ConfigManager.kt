@@ -2,6 +2,7 @@ package cn.huohuas001.huhobot.bungee.managers
 
 import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.provider.ChatFormat
+import cn.huohuas001.bot.provider.ConfigUpgrader
 import cn.huohuas001.bot.provider.CustomCommandDetail
 import cn.huohuas001.bot.provider.Motd
 import cn.huohuas001.bot.provider.WhiteList
@@ -19,6 +20,16 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
     private val configFile: File = File(plugin.dataFolder, "config.yml")
     private var config: Configuration = Configuration()
 
+    // 当前配置文件版本号，用于自动升级判断
+    private val currentVersion: Int = 2
+
+    // 配置文件自动升级: 缺失字段 → 默认值
+    private val upgradeDefaults: Map<String, Any> = mapOf(
+        "motd.markdown" to true,
+        "motd.customMarkdown" to false,
+        "connectUrl" to "native",
+    )
+
     init {
         loadConfig()
     }
@@ -35,7 +46,7 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
                 saveConfig()
             } else {
                 config = ConfigurationProvider.getProvider(YamlConfiguration::class.java).load(configFile)
-                if (ensureMarkdownConfig()) {
+                if (autoUpgradeConfig()) {
                     saveConfig()
                 }
             }
@@ -50,6 +61,8 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
         defaultConfig.set("name", "HuHoBot")
         defaultConfig.set("serverId", "")
         defaultConfig.set("hashKey", "")
+        defaultConfig.set("connectUrl", "native")
+        defaultConfig.set("version", currentVersion)
 
         defaultConfig.set("chatFormat.from_game", "<{name}> {msg}")
         defaultConfig.set("chatFormat.from_group", "群:<{nick}> {msg}")
@@ -87,19 +100,18 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
         return defaultConfig
     }
 
-    private fun ensureMarkdownConfig(): Boolean {
-        var changed = false
-        if (!config.contains("motd.markdown")) {
-            config.set("motd.markdown", true)
-            plugin.logger.info("已添加新的配置项: motd.markdown")
-            changed = true
+    /**
+     * 配置文件自动升级：补全缺失字段并将版本号提升到当前版本
+     */
+    private fun autoUpgradeConfig(): Boolean {
+        val oldVersion = config.getInt("version", 0)
+        val changed = ConfigUpgrader.fillMissing(upgradeDefaults, config::contains, config::set)
+        if (changed || oldVersion < currentVersion) {
+            config.set("version", currentVersion)
+            plugin.logger.info("配置文件已自动升级到版本 $currentVersion (旧版本: $oldVersion)")
+            return true
         }
-        if (!config.contains("motd.customMarkdown")) {
-            config.set("motd.customMarkdown", false)
-            plugin.logger.info("已添加新的配置项: motd.customMarkdown")
-            changed = true
-        }
-        return changed
+        return false
     }
 
     private fun saveConfig() {
@@ -195,6 +207,10 @@ class ConfigManager(private val plugin: HuHoBotBungee) : IConfigManager {
 
     override fun getFilterRegexList(): List<String> {
         return config.getStringList("filterRegex")
+    }
+
+    override fun getConnectUrl(): String {
+        return config.getString("connectUrl", "native")
     }
 
     override fun isRedisEnabled(): Boolean {

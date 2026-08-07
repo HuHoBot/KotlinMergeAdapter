@@ -15,6 +15,7 @@ interface IConfigManager {
     fun getWhiteList(): WhiteList
     fun getCallbackConvertImg(): Int
     fun getFilterRegexList(): List<String>
+    fun getConnectUrl(): String
     fun loadCommandsFromConfig()
     fun reloadConfig(): Boolean
 

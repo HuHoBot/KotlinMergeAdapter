@@ -2,6 +2,7 @@ package cn.huohuas001.huhobot.velocity.managers
 
 import cn.huohuas001.bot.provider.BotShared
 import cn.huohuas001.bot.provider.ChatFormat
+import cn.huohuas001.bot.provider.ConfigUpgrader
 import cn.huohuas001.bot.provider.CustomCommandDetail
 import cn.huohuas001.bot.provider.Motd
 import cn.huohuas001.bot.provider.WhiteList
@@ -20,6 +21,16 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
     private val configFile: File = plugin.dataDirectory.resolve("config.yml").toFile()
     private lateinit var config: CommentedConfigurationNode
     private lateinit var loader: YamlConfigurationLoader
+
+    // 当前配置文件版本号，用于自动升级判断
+    private val currentVersion: Int = 2
+
+    // 配置文件自动升级: 缺失字段 → 默认值
+    private val upgradeDefaults: Map<String, Any> = mapOf(
+        "motd.markdown" to true,
+        "motd.customMarkdown" to false,
+        "connectUrl" to "native",
+    )
 
     init {
         loadConfig()
@@ -43,7 +54,7 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
                 saveConfig()
             } else {
                 config = loader.load()
-                if (ensureMarkdownConfig()) {
+                if (autoUpgradeConfig()) {
                     saveConfig()
                 }
             }
@@ -58,6 +69,8 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
         config.node("name").set("HuHoBot")
         config.node("serverId").set("")
         config.node("hashKey").set("")
+        config.node("connectUrl").set("native")
+        config.node("version").set(currentVersion)
 
         config.node("chatFormat", "from_game").set("<{name}> {msg}")
         config.node("chatFormat", "from_group").set("群:<{nick}> {msg}")
@@ -93,19 +106,22 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
         config.node("redis", "channel").set("HuHoBotChannel")
     }
 
-    private fun ensureMarkdownConfig(): Boolean {
-        var changed = false
-        if (config.node("motd", "markdown").virtual()) {
-            config.node("motd", "markdown").set(true)
-            plugin.logger.info("已添加新的配置项: motd.markdown")
-            changed = true
+    /**
+     * 配置文件自动升级：补全缺失字段并将版本号提升到当前版本
+     */
+    private fun autoUpgradeConfig(): Boolean {
+        val oldVersion = config.node("version").getInt(0)
+        val changed = ConfigUpgrader.fillMissing(
+            upgradeDefaults,
+            { path -> !config.node(*path.split(".").toTypedArray()).virtual() },
+            { path, value -> config.node(*path.split(".").toTypedArray()).set(value) }
+        )
+        if (changed || oldVersion < currentVersion) {
+            config.node("version").set(currentVersion)
+            plugin.logger.info("配置文件已自动升级到版本 $currentVersion (旧版本: $oldVersion)")
+            return true
         }
-        if (config.node("motd", "customMarkdown").virtual()) {
-            config.node("motd", "customMarkdown").set(false)
-            plugin.logger.info("已添加新的配置项: motd.customMarkdown")
-            changed = true
-        }
-        return changed
+        return false
     }
 
     private fun saveConfig() {
@@ -204,6 +220,10 @@ class ConfigManager(private val plugin: HuHoBotVelocity) : IConfigManager {
 
     override fun getFilterRegexList(): List<String> {
         return config.node("filterRegex").getList(String::class.java, emptyList()) ?: emptyList()
+    }
+
+    override fun getConnectUrl(): String {
+        return config.node("connectUrl").getString("native") ?: "native"
     }
 
     override fun isRedisEnabled(): Boolean {

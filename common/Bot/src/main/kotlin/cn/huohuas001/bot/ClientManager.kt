@@ -72,9 +72,16 @@ object ClientManager {
     fun connectServer(): Boolean {
         synchronized(this) {
             val plugin = BotShared.getPlugin()
-            plugin.log_info(" 正在连接服务端...")
+            val connectUrl = plugin.getConnectUrl()
+            // 若配置了自定义连接地址(非native)，则使用配置的地址进行连接
+            val url = if (connectUrl == "native") websocketUrl else connectUrl
+            if (connectUrl == "native") {
+                plugin.log_info(" 正在连接服务端...")
+            } else {
+                plugin.log_info("正在连接MainServer:$connectUrl")
+            }
             try {
-                val uri = URI(websocketUrl)
+                val uri = URI(url)
                 // 更严格的连接检查
                 if(client != null && client!!.isOpen){
                     plugin.log_info(" 已存在活跃连接，无需重新连接")

@@ -6,6 +6,7 @@ build/
 
 .claude/
 .deepseek/
+.codewhale/
 
 **/**/debug*
 
@@ -18,6 +19,7 @@ build/
 *.iws
 *.iml
 *.ipr
+*.log
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/

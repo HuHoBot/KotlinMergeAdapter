@@ -117,6 +117,10 @@ class HuHoBotNkMot: PluginBase(), HuHoBot {
         return File(dataFolder, "config.yml")
     }
 
+    override fun getConnectUrl(): String {
+        return config.connectUrl
+    }
+
     override fun getServerId(): String {
         return config.getServerId()
     }

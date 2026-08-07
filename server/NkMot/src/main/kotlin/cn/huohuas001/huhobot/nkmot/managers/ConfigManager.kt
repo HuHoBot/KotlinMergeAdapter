@@ -1,5 +1,6 @@
 package cn.huohuas001.huhobot.nkmot.managers
 
+import cn.huohuas001.bot.provider.ConfigUpgrader
 import cn.huohuas001.bot.provider.CustomCommandDetail
 import cn.huohuas001.bot.tools.getPackID
 import cn.huohuas001.huhobot.nkmot.HuHoBotNkMot
@@ -9,7 +10,7 @@ import java.io.File
 
 class ConfigManager(private val plugin: HuHoBotNkMot) {
     private val config: Config
-    private val currentVersion = 5
+    private val currentVersion = 6
 
     // 根配置项
     private var serverId: String
@@ -26,6 +27,8 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
         private set
     var filterRegex: List<String>
         private set
+    var connectUrl: String
+        private set
 
     init {
         plugin.saveResource("config.yml")
@@ -36,6 +39,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
                 // 默认配置
                 put("serverId", getPackID())
                 put("hashKey", null)
+                put("connectUrl", "native")
                 put("chatFormat", ConfigSection().apply {
                     put("from_game", "<{name}> {msg}")
                     put("from_group", "群:<{nick}> {msg}")
@@ -86,6 +90,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
         // 初始化配置项
         serverId = config.getString("serverId")
         hashKey = config.getString("hashKey")
+        connectUrl = config.getString("connectUrl", "native")
         chatFormat = ChatFormatConfig(config.getSection("chatFormat"))
         motd = MotdConfig(config.getSection("motd"))
         postEvent = PostEventConfig(config.getSection("postEvent"))
@@ -151,6 +156,7 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
         // 定义所有已知配置路径 → 默认值的映射表
         val allDefaults = mapOf<String, Any>(
             "serverId" to getPackID(),
+            "connectUrl" to "native",
             "version" to currentVersion,
             "callbackConvertImg" to 0,
             "filterRegex" to listOf("\\u001B\\[[;\\d]*[ -/]*[@-~]"),
@@ -172,12 +178,9 @@ class ConfigManager(private val plugin: HuHoBotNkMot) {
             "postEvent.onLeft.formatString" to "玩家 {playerName} 离开了服务器",
         )
 
-        for ((path, defaultValue) in allDefaults) {
-            if (!config.exists(path)) {
-                config.set(path, defaultValue)
-                changed = true
-                plugin.logger.info("已补全缺失的配置项: $path")
-            }
+        changed = ConfigUpgrader.fillMissing(allDefaults, config::exists) { path, value ->
+            config.set(path, value)
+            plugin.logger.info("已补全缺失的配置项: $path")
         }
 
         // 补全 customCommand（列表类型需特殊处理）

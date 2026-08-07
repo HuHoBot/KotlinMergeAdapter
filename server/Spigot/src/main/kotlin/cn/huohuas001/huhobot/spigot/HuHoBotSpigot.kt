@@ -115,6 +115,10 @@ class HuHoBotSpigot: JavaPlugin(),HuHoBot {
         return configManager.getHashKey()
     }
 
+    override fun getConnectUrl(): String {
+        return config.getString("connectUrl", "native") ?: "native"
+    }
+
     override fun getPlatform(): String {
         return "spigot"
     }

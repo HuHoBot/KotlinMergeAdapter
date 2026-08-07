@@ -168,6 +168,10 @@ class HuHoBotBungee : Plugin(), HuHoBotProxy {
         return configManager.getFilterRegexList()
     }
 
+    override fun getConnectUrl(): String {
+        return configManager.getConnectUrl()
+    }
+
     override fun loadCustomCommand() {
         configManager.loadCommandsFromConfig()
     }

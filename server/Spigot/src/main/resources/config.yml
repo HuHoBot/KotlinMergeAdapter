@@ -1,6 +1,9 @@
 serverId: null
 hashKey: null
 
+# 连接服务器地址 (默认native使用内置地址, 可填写自定义ws地址, 如: ws://127.0.0.1:8888)
+connectUrl: "native"
+
 chatFormat:
   from_game: "<{name}> {msg}"
   from_group: "群:<{nick}> {msg}"
@@ -44,4 +47,4 @@ postEvent:
     enable: false
     formatString: "玩家 {playerName} 离开了服务器"
 
-version: 10
+version: 11

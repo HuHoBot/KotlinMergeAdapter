@@ -33,6 +33,14 @@ class CustomCommandDetail(
 )
 
 interface ConfigProvider {
+    /**
+     * 获取连接服务器地址，默认为 "native"（使用内置地址），
+     * 若配置了自定义 ws 地址则返回该地址
+     */
+    fun getConnectUrl(): String {
+        return "native"
+    }
+
     fun getChatFormat(): ChatFormat
     fun getMotd(): Motd
     fun getConfigFile(): File? {

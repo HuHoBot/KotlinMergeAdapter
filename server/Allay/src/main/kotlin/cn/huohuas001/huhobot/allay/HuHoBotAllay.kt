@@ -157,6 +157,10 @@ class HuHoBotAllay: Plugin(), HuHoBot {
         return Path.of(CONFIG_FILE_NAME).toFile()
     }
 
+    override fun getConnectUrl(): String {
+        return config.connectUrl
+    }
+
     override fun getServerId(): String {
         return config.serverId
     }

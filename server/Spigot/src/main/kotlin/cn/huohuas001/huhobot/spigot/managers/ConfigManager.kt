@@ -1,6 +1,7 @@
 package cn.huohuas001.huhobot.spigot.manager
 
 import cn.huohuas001.bot.provider.BotShared
+import cn.huohuas001.bot.provider.ConfigUpgrader
 import cn.huohuas001.bot.provider.CustomCommandDetail
 import cn.huohuas001.bot.tools.getPackID
 import cn.huohuas001.huhobot.spigot.HuHoBotSpigot
@@ -10,7 +11,16 @@ import java.io.File
 class ConfigManager(private val plugin: HuHoBotSpigot) {
 
     private val configFile: File = File(plugin.dataFolder, "config.yml")
-    private val version: Int = 10
+    private val version: Int = 11
+
+    // 配置文件自动升级: 缺失字段 → 默认值
+    private val upgradeDefaults: Map<String, Any> = mapOf(
+        "postEvent.onJoin.enable" to false,
+        "postEvent.onJoin.formatString" to "玩家 {playerName} 加入了服务器",
+        "postEvent.onLeft.enable" to false,
+        "postEvent.onLeft.formatString" to "玩家 {playerName} 离开了服务器",
+        "connectUrl" to "native",
+    )
 
     init {
         if (checkConfig()) {
@@ -23,7 +33,8 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
             val config = plugin.config
             val version = if (config.contains("version")) config.getInt("version") else -1
             return this.version > version ||
-                    !config.contains("postEvent.onJoin.enable")
+                    !config.contains("postEvent.onJoin.enable") ||
+                    !config.contains("connectUrl")
         }
         return true
     }
@@ -33,22 +44,12 @@ class ConfigManager(private val plugin: HuHoBotSpigot) {
         plugin.reloadConfig()
         val config = plugin.config
 
-        if (!config.contains("postEvent.onJoin.enable")) {
-            config.set("postEvent.onJoin.enable", false)
-        }
-        if (!config.contains("postEvent.onJoin.formatString")) {
-            config.set("postEvent.onJoin.formatString", "玩家 {playerName} 加入了服务器")
-        }
-        if (!config.contains("postEvent.onLeft.enable")) {
-            config.set("postEvent.onLeft.enable", false)
-        }
-        if (!config.contains("postEvent.onLeft.formatString")) {
-            config.set("postEvent.onLeft.formatString", "玩家 {playerName} 离开了服务器")
-        }
+        val oldVersion = if (config.contains("version")) config.getInt("version") else -1
+        ConfigUpgrader.fillMissing(upgradeDefaults, config::contains, config::set)
 
         config.set("version", this.version)
         plugin.saveConfig()
-        plugin.pluginLogger.info("配置文件已升级到版本 $version")
+        plugin.pluginLogger.info("配置文件已自动升级到版本 $version (旧版本: $oldVersion)")
     }
 
     fun loadCommandsFromConfig() {

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("ALL")
 public class HuHoBotConfig extends OkaeriConfig {
     @Exclude
-    private static final int CURRENT_VERSION = 5;
+    private static final int CURRENT_VERSION = 6;
 
     // region Getters & Setters
     // region 核心配置
@@ -37,6 +37,13 @@ public class HuHoBotConfig extends OkaeriConfig {
             "! 请勿手动修改，留空即可"
     })
     public String hashKey = null;
+
+    @Getter
+    @Setter
+    @Comment({
+            "连接服务器地址 (默认native使用内置地址, 可填写自定义ws地址, 如: ws://127.0.0.1:8888)"
+    })
+    public String connectUrl = "native";
     // endregion
 
     // region 聊天配置
@@ -89,7 +96,7 @@ public class HuHoBotConfig extends OkaeriConfig {
     // 在PluginConfig类顶部添加版本字段
     @Comment("配置版本")
     @CustomKey("version")
-    private int configVersion = 3;
+    private int configVersion = CURRENT_VERSION;
     // endregion
 
     // 废弃原有motdUrl字段
